@@ -1,12 +1,12 @@
 /**
- * TCPROSMessageBase.java
+ * ROSXmlRpcServerException.java
  *
  * @author Yuki Suga (ysuga.net)
- * @date 2011/09/06
+ * @date 2011/09/15
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.node;
 
 /**
  * <div lang="ja">
@@ -18,7 +18,6 @@ package net.ysuga.ros.javros.tcpros;
  * @author ysuga
  *
  */
-public interface TCPROSMessage {
+public class ROSXmlRpcServerException extends Exception {
 
-	public byte[] serialize() throws TransportException;
 }

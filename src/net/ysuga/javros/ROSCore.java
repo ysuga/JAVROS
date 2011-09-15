@@ -8,28 +8,28 @@
  */
 package net.ysuga.javros;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.ysuga.javros.remote.NoRemoteCommandServiceException;
+import net.ysuga.javros.core.MasterAPIHelper;
+import net.ysuga.javros.core.MasterAPIRef;
+import net.ysuga.javros.node.ROSNode;
+import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.node.service.ROSService;
+import net.ysuga.javros.node.service.ROSServiceFactory;
+import net.ysuga.javros.node.service.ROSServiceNotFoundException;
+import net.ysuga.javros.node.service.ROSServiceTypeInfo;
+import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicTypeInfo;
 import net.ysuga.javros.remote.RemoteCommandService;
 import net.ysuga.javros.remote.RemoteCommandServiceClient;
-import net.ysuga.ros.javros.api.MasterAPIHelper;
-import net.ysuga.ros.javros.api.MasterAPIRef;
-import net.ysuga.ros.javros.api.ReturnValue;
-import net.ysuga.ros.javros.api.XmlRpcRequestException;
-import net.ysuga.ros.javros.tcpros.ROSNode;
-import net.ysuga.ros.javros.tcpros.ROSService;
-import net.ysuga.ros.javros.tcpros.ROSServiceFactory;
-import net.ysuga.ros.javros.tcpros.ROSServiceNotFoundException;
-import net.ysuga.ros.javros.tcpros.ROSServiceTypeInfo;
-import net.ysuga.ros.javros.tcpros.ROSTopic;
-import net.ysuga.ros.javros.tcpros.ROSTopicPublisherRef;
-import net.ysuga.ros.javros.tcpros.ROSTopicTypeInfo;
+import net.ysuga.javros.remote.RemoteCommandServiceException;
+import net.ysuga.javros.util.ROSUri;
+import net.ysuga.javros.util.ReturnValue;
+import net.ysuga.ros.javros.tcpros.TransportException;
 
 /**
  * <div lang="ja">
@@ -75,12 +75,12 @@ public class ROSCore {
 	 * <div lang="ja"> コンストラクタ </div> <div lang="en"> Constructor </div>
 	 */
 	private ROSCore(String hostAddress, int portNumber)
-			throws java.net.MalformedURLException {
+			throws MalformedURLException {
 		this.callerid = "/javrosCore";
 		this.hostAddress = hostAddress;
 		this.port = portNumber;
-		masterAPI = new MasterAPIHelper(new MasterAPIRef("http://"
-				+ hostAddress + ":" + port));
+		masterAPI = new MasterAPIHelper(new MasterAPIRef(new URL("http://"
+				+ hostAddress + ":" + port)));
 	}
 
 	static public ROSCore init(String hostAddress) throws MalformedURLException {
@@ -121,8 +121,7 @@ public class ROSCore {
 	}
 
 	public List<String> getProvidedServiceNameList()
-			throws XmlRpcRequestException, UnknownHostException, IOException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+			throws XmlRpcRequestException {
 		ArrayList<String> retval = new ArrayList<String>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
 		Object[] serviceList = (Object[]) result.getValue()[2];
@@ -134,8 +133,7 @@ public class ROSCore {
 	}
 
 	public List<ROSService> getProvidedServiceList()
-			throws XmlRpcRequestException, UnknownHostException, IOException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+			throws XmlRpcRequestException, RemoteCommandServiceException {
 		ArrayList<ROSService> retval = new ArrayList<ROSService>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
 		Object[] serviceList = (Object[]) result.getValue()[2];
@@ -159,64 +157,71 @@ public class ROSCore {
 		return retval;
 	}
 
-	public String getServiceType(String serviceName)
-			throws UnknownHostException, IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public String getServiceType(String serviceName)
+			throws RemoteCommandServiceException {
 		return remoteCommand("service", "type", serviceName);
 	}
 
-	public String getTopicType(String topicName) throws UnknownHostException,
-			IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public String getTopicType(String topicName)
+			throws RemoteCommandServiceException {
 		return remoteCommand("topic", "type", topicName);
 	}
 
-	public String getServiceMd5Sum(String serviceType)
-			throws UnknownHostException, IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public String getServiceMd5Sum(String serviceType)
+			throws RemoteCommandServiceException {
 		return remoteCommand("srv", "md5", serviceType);
 	}
 
-	public String getTopicMd5Sum(String topicType) throws UnknownHostException,
-			IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public String getTopicMd5Sum(String topicType)
+			throws RemoteCommandServiceException {
 		return remoteCommand("msg", "md5", topicType);
 	}
 
-	public ROSServiceTypeInfo getServiceTypeInfo(String serviceType)
-			throws UnknownHostException, IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public ROSServiceTypeInfo getServiceTypeInfo(String serviceType)
+			throws RemoteCommandServiceException {
 		return new ROSServiceTypeInfo(remoteCommand("srv", "show", serviceType));
 	}
 
-	public ROSTopicTypeInfo getTopicTypeInfo(String topicType)
-			throws UnknownHostException, IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	final public ROSTopicTypeInfo getTopicTypeInfo(String topicType)
+			throws RemoteCommandServiceException {
 		return new ROSTopicTypeInfo(remoteCommand("msg", "show", topicType));
 	}
 
-	private String remoteCommand(String command, String option, String arg)
-			throws UnknownHostException, IOException, XmlRpcRequestException,
-			NoRemoteCommandServiceException, ROSServiceNotFoundException {
-		List<String> services = getProvidedServiceNameList();
-		if (!services.contains(RemoteCommandService.getInstance().getName())) {
-			System.out.println("Start remote_command Service in roscore host.");
-			throw new NoRemoteCommandServiceException();
-		}
+	final private String remoteCommand(String command, String option, String arg)
+			throws RemoteCommandServiceException {
+		try {
+			List<String> services = getProvidedServiceNameList();
+			if (!services
+					.contains(RemoteCommandService.getInstance().getName())) {
+				System.out
+						.println("Start remote_command Service in roscore host.");
+				throw new RemoteCommandServiceException("not found");
+			}
 
-		List<String> providers = getAllServiceProviderUri(RemoteCommandService
-				.getInstance());
-		if (providers.size() == 0) {
-			System.out.println("Start remote_command Service in roscore host.");
-			throw new NoRemoteCommandServiceException();
-		}
+			List<String> providers = getAllServiceProviderUri(RemoteCommandService
+					.getInstance());
+			if (providers.size() == 0) {
+				System.out
+						.println("Start remote_command Service in roscore host.");
+				throw new RemoteCommandServiceException("not found");
+			}
 
-		RemoteCommandServiceClient client = new RemoteCommandServiceClient(
-				callerid);
-		List<Object> args = Arrays.asList((Object) command, (Object) option,
-				(Object) arg);
-		List<Object> ret = client.execute(args);
-		return ((String) ret.get(0)).trim();
+			RemoteCommandServiceClient client = new RemoteCommandServiceClient(
+					callerid);
+			List<Object> args = Arrays.asList((Object) command,
+					(Object) option, (Object) arg);
+			List<Object> ret = client.execute(args);
+			return ((String) ret.get(0)).trim();
+		} catch (XmlRpcRequestException e) {
+			throw new RemoteCommandServiceException(
+					"master api request failed.");
+		} catch (TransportException e) {
+			throw new RemoteCommandServiceException(
+					"transporting service value is failed..");
+		} catch (ROSServiceNotFoundException e) {
+			throw new RemoteCommandServiceException(
+					"Remote command service is not found..");
+		}
 	}
 
 	/**
@@ -229,26 +234,20 @@ public class ROSCore {
 	 * @return </div>
 	 * @throws XmlRpcRequestException
 	 */
-	public List<ROSUri> registerSubscriber(ROSTopic topic,
-			ROSNode node)
+	public List<ROSUri> registerSubscriber(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		System.out.println("ROSCore#registerSubscriber(" + topic.toString() + ", " + node.getName()+")");
+		System.out.println("ROSCore#registerSubscriber(" + topic.toString()
+				+ ", " + node.getName() + ")");
 		ReturnValue<List<ROSUri>> ret = getMaster().registerSubscriber(
-				node.getName(), topic.getName(),
-				topic.getType(), node.getXmlRpcUri());
+				node.getName(), topic.getName(), topic.getType(),
+				node.getSlaveServerUri());
 		System.out.println("Code = " + ret.getCode());
 		try {
-			for(ROSUri uri : ret.getValue()) {
-				ROSTopicPublisherRef publisher = new ROSTopicPublisherRef(uri, topic, node);
-				node.addPublisherRef(publisher);
+			for (ROSUri uri : ret.getValue()) {
+				node.addPublisherRef(uri, topic);
 			}
-			
-		} catch (UnknownHostException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new XmlRpcRequestException();
 		}
 		return ret.getValue();
 	}
@@ -265,10 +264,11 @@ public class ROSCore {
 	 */
 	public List<ROSUri> registerPublisher(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		System.out.println("ROSCore#registerPublisher(" + topic.toString() + ", " + node.getName()+")");
+		System.out.println("ROSCore#registerPublisher(" + topic.toString()
+				+ ", " + node.getName() + ")");
 		ReturnValue<List<ROSUri>> ret = getMaster().registerPublisher(
 				node.getName(), topic.getName(), topic.getType(),
-				node.getXmlRpcUri());
+				node.getSlaveServerUri());
 		System.out.println("Code = " + ret.getCode());
 
 		return ret.getValue();

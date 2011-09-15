@@ -1,9 +1,7 @@
 import net.ysuga.javros.ROSCore;
-import net.ysuga.ros.javros.api.ROS;
-import net.ysuga.ros.javros.tcpros.ROSNode;
-import net.ysuga.ros.javros.tcpros.ROSTopic;
-import net.ysuga.ros.javros.tcpros.ROSTopicFactory;
-import net.ysuga.ros.javros.tcpros.ROSTopicPublisher;
+import net.ysuga.javros.node.ROSNode;
+import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicFactory;
 
 /**
  * ROSNodeTest.java
@@ -26,6 +24,7 @@ import net.ysuga.ros.javros.tcpros.ROSTopicPublisher;
  */
 public class ROSNodeTest {
 
+	
 	/**
 	 * <div lang="ja">
 	 * コンストラクタ
@@ -42,7 +41,6 @@ public class ROSNodeTest {
 		//String hostAddress = "192.168.1.101";
 
 		try {
-			ROS.init(myAddress);
 			ROSCore.init(hostAddress);
 
 			ROSNode node = new ROSNode(myAddress, 40000, "/javrosNode");

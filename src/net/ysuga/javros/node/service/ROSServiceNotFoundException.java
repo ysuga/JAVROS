@@ -1,12 +1,12 @@
 /**
- * TCPROSMessageBase.java
+ * ROSServiceNotFoundException.java
  *
  * @author Yuki Suga (ysuga.net)
  * @date 2011/09/06
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.node.service;
 
 /**
  * <div lang="ja">
@@ -18,7 +18,6 @@ package net.ysuga.ros.javros.tcpros;
  * @author ysuga
  *
  */
-public interface TCPROSMessage {
+public class ROSServiceNotFoundException extends Exception {
 
-	public byte[] serialize() throws TransportException;
 }

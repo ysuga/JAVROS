@@ -1,9 +1,9 @@
 import java.util.List;
 
 import net.ysuga.javros.ROSCore;
-import net.ysuga.ros.javros.tcpros.ROSServiceTypeInfo;
-import net.ysuga.ros.javros.tcpros.ROSTopic;
-import net.ysuga.ros.javros.tcpros.ROSTopicFactory;
+import net.ysuga.javros.node.service.ROSServiceTypeInfo;
+import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicFactory;
 
 /**
  * RefrectionServiceTest.java

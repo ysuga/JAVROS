@@ -11,50 +11,47 @@ package net.ysuga.javros.remote;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import net.ysuga.ros.javros.api.XmlRpcRequestException;
-import net.ysuga.ros.javros.tcpros.ROSService;
-import net.ysuga.ros.javros.tcpros.ROSServiceNotFoundException;
-import net.ysuga.ros.javros.tcpros.TCPROSServiceClient;
+import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.node.service.ROSServiceNotFoundException;
+import net.ysuga.javros.node.service.TCPROSServiceClient;
+import net.ysuga.ros.javros.tcpros.TransportException;
 
 /**
  * <div lang="ja">
- *
+ * 
+ * </div> <div lang="en">
+ * 
  * </div>
- * <div lang="en">
- *
- * </div>
+ * 
  * @author ysuga
- *
+ * 
  */
 public class RemoteCommandServiceClient extends TCPROSServiceClient {
 
 	/**
-	 * <div lang="ja">
-	 * コンストラクタ
+	 * <div lang="ja"> コンストラクタ
+	 * 
 	 * @param hostAddress
 	 * @param port
 	 * @param callerid
 	 * @param service
 	 * @throws UnknownHostException
 	 * @throws IOException
-	 * </div>
-	 * <div lang="en">
-	 * Constructor
+	 *             </div> <div lang="en"> Constructor
 	 * @param hostAddress
 	 * @param port
 	 * @param callerid
 	 * @param service
+	 * @throws TransportException
 	 * @throws UnknownHostException
 	 * @throws IOException
-	 * </div>
-	 * @throws NoRemoteCommandServiceException 
-	 * @throws XmlRpcRequestException 
-	 * @throws ROSServiceNotFoundException 
+	 *             </div>
+	 * @throws RemoteCommandServiceException
+	 * @throws XmlRpcRequestException
+	 * @throws ROSServiceNotFoundException
 	 */
-	public RemoteCommandServiceClient(String callerid) throws UnknownHostException,
-			IOException, XmlRpcRequestException, NoRemoteCommandServiceException, ROSServiceNotFoundException {
+	public RemoteCommandServiceClient(String callerid) throws XmlRpcRequestException, ROSServiceNotFoundException, TransportException {
 		super(callerid, RemoteCommandService.getInstance());
 	}
-
 
 }

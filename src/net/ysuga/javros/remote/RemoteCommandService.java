@@ -8,8 +8,8 @@
  */
 package net.ysuga.javros.remote;
 
-import net.ysuga.ros.javros.tcpros.ROSService;
-import net.ysuga.ros.javros.tcpros.ROSServiceTypeInfo;
+import net.ysuga.javros.node.service.ROSService;
+import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 
 /**
  * <div lang="ja">

@@ -1,12 +1,12 @@
 /**
- * TCPROSMessageBase.java
+ * NoRemoteCommandServiceException.java
  *
  * @author Yuki Suga (ysuga.net)
  * @date 2011/09/06
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.remote;
 
 /**
  * <div lang="ja">
@@ -18,7 +18,9 @@ package net.ysuga.ros.javros.tcpros;
  * @author ysuga
  *
  */
-public interface TCPROSMessage {
+public class RemoteCommandServiceException extends Exception {
 
-	public byte[] serialize() throws TransportException;
+	public RemoteCommandServiceException(String msg) {
+		super(msg);
+	}
 }
