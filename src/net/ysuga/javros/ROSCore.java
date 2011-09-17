@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.ysuga.javros.core.MasterAPIHelper;
 import net.ysuga.javros.core.MasterAPIRef;
@@ -23,6 +24,7 @@ import net.ysuga.javros.node.service.ROSServiceFactory;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
 import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicInvalidTypeInfoException;
 import net.ysuga.javros.node.topic.ROSTopicTypeInfo;
 import net.ysuga.javros.remote.RemoteCommandService;
 import net.ysuga.javros.remote.RemoteCommandServiceClient;
@@ -43,6 +45,8 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  */
 public class ROSCore {
 
+	static private Logger logger = Logger.getLogger(ROSCore.class.getName());
+	
 	public static final int DEFAULT_PORT = 11311;
 
 	static private ROSCore theOnlyInstance;
@@ -89,6 +93,7 @@ public class ROSCore {
 
 	static public ROSCore init(String hostAddress, int portNumber)
 			throws MalformedURLException {
+		logger.entering(ROSCore.class.getName(), "init("+hostAddress + ", " + portNumber+ ")");
 		theOnlyInstance = new ROSCore(hostAddress, portNumber);
 		return getInstance();
 	}
@@ -183,7 +188,7 @@ public class ROSCore {
 	}
 
 	final public ROSTopicTypeInfo getTopicTypeInfo(String topicType)
-			throws RemoteCommandServiceException {
+			throws RemoteCommandServiceException, ROSTopicInvalidTypeInfoException {
 		return new ROSTopicTypeInfo(remoteCommand("msg", "show", topicType));
 	}
 
@@ -236,12 +241,11 @@ public class ROSCore {
 	 */
 	public List<ROSUri> registerSubscriber(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		System.out.println("ROSCore#registerSubscriber(" + topic.toString()
-				+ ", " + node.getName() + ")");
+		logger.entering(this.getClass().getName(), "registerSubscriber("+topic+", "+node+")");
 		ReturnValue<List<ROSUri>> ret = getMaster().registerSubscriber(
 				node.getName(), topic.getName(), topic.getType(),
 				node.getSlaveServerUri());
-		System.out.println("Code = " + ret.getCode());
+		node.addSubscribingTopic(topic);
 		try {
 			for (ROSUri uri : ret.getValue()) {
 				node.addPublisherRef(uri, topic);
@@ -250,6 +254,26 @@ public class ROSCore {
 			throw new XmlRpcRequestException();
 		}
 		return ret.getValue();
+	}
+	/**
+	 * unregisterSubscriber
+	 * <div lang="ja">
+	 * 
+	 * @param topic
+	 * @param node
+	 * </div>
+	 * <div lang="en">
+	 *
+	 * @param topic
+	 * @param node
+	 * </div>
+	 */
+	public ReturnValue<Integer> unregisterSubscriber(ROSTopic topic, ROSNode node) throws XmlRpcRequestException {
+		logger.entering(this.getClass().getName(), "unregisterSubscriber("+topic+", "+node+")");
+		ReturnValue<Integer> ret = getMaster().unregisterSubscriber(
+				node.getName(), topic.getName(), node.getSlaveServerUri());
+		node.removeSubscribingTopic(topic);
+		return ret;
 	}
 
 	/**
@@ -264,16 +288,38 @@ public class ROSCore {
 	 */
 	public List<ROSUri> registerPublisher(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		System.out.println("ROSCore#registerPublisher(" + topic.toString()
-				+ ", " + node.getName() + ")");
+		logger.entering(this.getClass().getName(), "registerPublisher("+topic+", "+node);
 		ReturnValue<List<ROSUri>> ret = getMaster().registerPublisher(
 				node.getName(), topic.getName(), topic.getType(),
 				node.getSlaveServerUri());
-		System.out.println("Code = " + ret.getCode());
-
+		node.addPublishingTopic(topic);
 		return ret.getValue();
 	}
 
+	/**
+	 * 
+	 * unregisterPublisher
+	 * <div lang="ja">
+	 * 
+	 * @param topic
+	 * @param node
+	 * @throws XmlRpcRequestException
+	 * </div>
+	 * <div lang="en">
+	 *
+	 * @param topic
+	 * @param node
+	 * @throws XmlRpcRequestException
+	 * </div>
+	 */
+	public ReturnValue<Integer> unregisterPublisher(ROSTopic topic, ROSNode node) throws XmlRpcRequestException {
+		logger.entering(this.getClass().getName(), "unregisterPublisher("+topic+", "+node+")");
+		ReturnValue<Integer> ret = getMaster().unregisterPublisher(
+				node.getName(), topic.getName(), node.getSlaveServerUri());
+		node.removeSubscribingTopic(topic);
+		return ret;
+	}
+	
 	/**
 	 * getNodeUri <div lang="ja">
 	 * 
@@ -290,4 +336,5 @@ public class ROSCore {
 		return new ROSUri(uri.getValue());
 	}
 
+	
 }

@@ -34,7 +34,7 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  * @author ysuga
  * 
  */
-public class ROSTopicPublisherRef extends SlaveAPIHelper {
+public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 
 	private ROSNode ownerSubscriber;
 
@@ -50,6 +50,9 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper {
 	private TCPROSHeader header;
 	
 	private String name;
+	
+
+	private Thread thread;
 
 	/**
 	 * <div lang="ja"> コンストラクタ
@@ -67,11 +70,9 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper {
 			ROSNode owner) throws XmlRpcRequestException, TransportException {
 		super(new SlaveAPIRef(uri));
 		this.ownerSubscriber = owner;
-		//this.name = publisherName;
 		this.topic = topic;
 		ReturnValue<ROSUri> ret = requestTopic(owner.getName(),topic.getName(), new Object[] {new Object[] { "TCPROS" } });
 		protocol = ret.getValue();
-		// transportList = new ArrayList<TCPROSTransport>();
 		transport = new TCPROSTransport();
 		
 		header = new TCPROSHeader();
@@ -80,8 +81,24 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper {
 		header.put("type", topic.getType());
 		header.put("md5sum", topic.getMd5sum());
 		header.put("latching", "0");
+		
+		thread = new Thread(this);
+		thread.start();
 
-		connect();
+	}
+	
+	public void run() {
+		try {
+			connect();
+			while (true) {
+				byte[] value = transport.receive();
+				ROSTopicValue topicValue = new ROSTopicValue(topic.getTopicTypeInfo(), value, this);
+				this.ownerSubscriber.setTopicValue(this.topic, topicValue);
+				Thread.sleep(30);
+			}
+		} catch (Exception e) {
+
+		}
 	}
 
 	private void connect() throws TransportException {
@@ -140,7 +157,6 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper {
 	 *         only provided by slaves written in </div>
 	 */
 	public Object[] getBusInfo(int counter) {
-
 		Integer connectionId = new Integer(counter);
 		String destinationId = getHostUri();//protocol.getUri();
 		String direction = "i";
@@ -149,9 +165,6 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper {
 		Boolean connected = new Boolean(true);
 		Object[] ret = new Object[] { connectionId, destinationId, direction,
 				transport, topic, connected };
-		
-		//	System.out.println(ret);
 		return ret;
-
 	}
 }

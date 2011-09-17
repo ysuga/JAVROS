@@ -51,5 +51,25 @@ public class ReturnValue<RetType> {
 		this.statusMessage = statusMessage;
 		this.value = value;
 	}
+	
+	final public boolean isSuccess() {
+		if(this.code == ROSAPIStatusCode.ROSAPI_SUCCESS) {
+			return true;
+		}
+		return false;
+	}
 
+	final public boolean isFailed() {
+		if(this.code == ROSAPIStatusCode.ROSAPI_FAILURE) {
+			return true;
+		}
+		return false;
+	}
+	
+	final public boolean isError() {
+		if(this.code == ROSAPIStatusCode.ROSAPI_ERROR) {
+			return true;
+		}
+		return false;
+	}
 }

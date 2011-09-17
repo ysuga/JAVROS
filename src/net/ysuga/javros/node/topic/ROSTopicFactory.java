@@ -49,7 +49,13 @@ public class ROSTopicFactory {
 		if(!createdROSTopicMap.containsKey(topicName)) {
 			String topicType = ROSCore.getInstance().getTopicType(topicName);
 			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
-			topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
+			try {
+				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
+			} catch (ROSTopicInvalidTypeInfoException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+				throw new RemoteCommandServiceException("invalid topic type:" + topicName);
+			}
 			createdROSTopicMap.put(topicName, topic);
 		}
 		return createdROSTopicMap.get(topicName);
@@ -58,7 +64,13 @@ public class ROSTopicFactory {
 	static public ROSTopic createROSTopic(String topicName, String topicType) throws RemoteCommandServiceException {
 		if(!createdROSTopicMap.containsKey(topicName)) {
 			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
-			topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
+			try {
+				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
+			} catch (ROSTopicInvalidTypeInfoException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+				throw new RemoteCommandServiceException("invalid topic type:" + topicName);
+			}
 			createdROSTopicMap.put(topicName, topic);
 		}
 		return createdROSTopicMap.get(topicName);

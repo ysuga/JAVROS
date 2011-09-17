@@ -8,7 +8,8 @@
  */
 package net.ysuga.javros.node.topic;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -22,10 +23,12 @@ import java.util.StringTokenizer;
  * 
  */
 public class ROSTopicTypeInfo {
-	public Hashtable<String, String> param;
+	List<String> typeList;
+	List<String> nameList;
 
 	public ROSTopicTypeInfo() {
-		param = new Hashtable<String, String>();
+		typeList = new ArrayList<String>();
+		nameList = new ArrayList<String>();
 	}
 
 	/**
@@ -37,12 +40,18 @@ public class ROSTopicTypeInfo {
 	 * @param str
 	 *            </div>
 	 */
-	public ROSTopicTypeInfo(String str) {
+	public ROSTopicTypeInfo(String str) throws ROSTopicInvalidTypeInfoException {
 		this();
 		StringTokenizer tokenizer = new StringTokenizer(str);
 		while (tokenizer.hasMoreTokens()) {
-			String buffer = tokenizer.nextToken();
-			param.put(buffer, tokenizer.nextToken());
+			String type = tokenizer.nextToken();
+			if(tokenizer.hasMoreTokens()) {
+				String name = tokenizer.nextToken();
+				typeList.add(type);
+				nameList.add(name);
+			} else {
+				throw new ROSTopicInvalidTypeInfoException();
+			}
 		}
 	}
 

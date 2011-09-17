@@ -23,7 +23,7 @@ import net.ysuga.javros.node.topic.ROSTopicValue;
  * @author ysuga
  *
  */
-public class ROSNodeTest {
+public class TurtleSimTest {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class ROSNodeTest {
 	 * Constructor
 	 * </div>
 	 */
-	public ROSNodeTest() {
+	public TurtleSimTest() {
 		String myAddress = "192.168.42.128";
 		String hostAddress = "192.168.42.129";
 
@@ -46,13 +46,13 @@ public class ROSNodeTest {
 
 			ROSNode node = new ROSNode(myAddress, 40000, "/javrosNode");
 
-			ROSTopic topic = ROSTopicFactory.createROSTopic("/Num", "std_msgs/Int32");
+			ROSTopic topic = ROSTopicFactory.createROSTopic("/turtle1/pose", "turtlesim/Pose");
 			ROSCore.getInstance().registerSubscriber(topic, node);
 
 			for(int i = 0;i < 100;i++) {
 				Thread.sleep(500);
-				ROSTopicValue value = node.subscribe(topic);
-				System.out.println("value=\n"+value);
+				ROSTopicValue topicValue = node.subscribe(topic);
+				System.out.println("Subscribed=\n" + topicValue);
 			}
 			
 			ROSCore.getInstance().unregisterSubscriber(topic, node);
@@ -78,7 +78,7 @@ public class ROSNodeTest {
 	 */
 	public static void main(String[] args) {
 		try {
-			new ROSNodeTest();
+			new TurtleSimTest();
 		} catch (Exception ex) {
 			System.out.println("Exception: "  + ex);
 		}
