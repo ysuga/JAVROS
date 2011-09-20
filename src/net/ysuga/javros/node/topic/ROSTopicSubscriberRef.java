@@ -9,9 +9,12 @@
 package net.ysuga.javros.node.topic;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import net.ysuga.javros.node.ROSNode;
 import net.ysuga.javros.node.SlaveAPIHelper;
@@ -34,6 +37,8 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  */
 public class ROSTopicSubscriberRef extends SlaveAPIHelper implements Runnable {
 
+	private static Logger logger = Logger.getLogger(ROSTopicSubscriberRef.class.getName());
+	
 	private static final int ROS_PORT_BASE = 40000;
 
 	private ROSNode ownerNode;
@@ -55,7 +60,7 @@ public class ROSTopicSubscriberRef extends SlaveAPIHelper implements Runnable {
 	private TCPROSHeader header;
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * 
 	 * @param hostUri
 	 * @param hostUri
@@ -75,8 +80,6 @@ public class ROSTopicSubscriberRef extends SlaveAPIHelper implements Runnable {
 		transport = new TCPROSTransport(ROS_PORT_BASE);
 		this.protocol = new ROSUri("TCPROS", owner.getSlaveServerUri(),
 				transport.getPort());
-		thread = new Thread(this);
-		thread.start();
 
 		header = new TCPROSHeader();
 		header.put("callerid", owner.getName());
@@ -84,18 +87,30 @@ public class ROSTopicSubscriberRef extends SlaveAPIHelper implements Runnable {
 		header.put("type", topic.getType());
 		header.put("md5sum", topic.getMd5sum());
 		header.put("latching", "0");
+		thread = new Thread(this);
+		thread.start();
 	}
 
 	public void run() {
 		try {
-			System.out.println("Start!!!");
 			accept();
 			while (true) {
-				System.out.println("ROSTopicSubscriberRef#run()");
-				Thread.sleep(500);
+				if (ownerNode.topicPublished(topic)) {
+					ROSTopicValue value = ownerNode
+							.getPublishedTopicValue(topic);
+					if (value != null) {
+						byte[] b = value.serialize();
+						transport.send(b);
+					}
+				}
+				Thread.yield();
 			}
 		} catch (Exception e) {
-
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			logger.severe("ROSTopicSubscriberRef.run failed:\n"
+					+ sw.getBuffer().toString());		
 		}
 	}
 

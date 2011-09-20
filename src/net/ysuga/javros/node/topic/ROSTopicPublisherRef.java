@@ -9,9 +9,12 @@
 package net.ysuga.javros.node.topic;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import net.ysuga.javros.node.ROSNode;
 import net.ysuga.javros.node.SlaveAPIHelper;
@@ -35,6 +38,7 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  * 
  */
 public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
+	private static Logger logger = Logger.getLogger(ROSTopicPublisherRef.class.getName());
 
 	private ROSNode ownerSubscriber;
 
@@ -55,7 +59,7 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 	private Thread thread;
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * 
 	 * @param hostUri
 	 * @param hostUri
@@ -92,12 +96,16 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 			connect();
 			while (true) {
 				byte[] value = transport.receive();
-				ROSTopicValue topicValue = new ROSTopicValue(topic.getTopicTypeInfo(), value, this);
+				ROSTopicValue topicValue = new ROSTopicValue(topic, value, this);
 				this.ownerSubscriber.setTopicValue(this.topic, topicValue);
-				Thread.sleep(30);
+				Thread.yield();
 			}
 		} catch (Exception e) {
-
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			logger.severe("ROSTopicPublisherRef.run failed:\n"
+					+ sw.getBuffer().toString());
 		}
 	}
 
@@ -137,7 +145,7 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 			String v = is.readString(size);
 			System.out.println("msg:::"+v);
 		} catch (IOException e) {
-			// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 			e.printStackTrace();
 		}
 		System.out.println("received.");

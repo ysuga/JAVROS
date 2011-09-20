@@ -47,8 +47,12 @@ public class ROSNode {
 
 	private Object topicValueMapMutex;
 
-	private Map<ROSTopic, ROSTopicValue> topicValueMap;
+	private Map<ROSTopic, ROSTopicValue> subscribedTopicValueMap;
 
+	private Map<ROSTopic, Boolean> topicPublishedFlagMap;
+	
+	private Map<ROSTopic, ROSTopicValue> publishedTopicValueMap;
+	
 	private Set<ROSTopic> publishingTopicSet;
 
 	private Set<ROSTopic> subscribingTopicSet;
@@ -110,6 +114,8 @@ public class ROSNode {
 	 */
 	private ROSXmlRpcServer slaveServer;
 
+	private Object publishedTopicValueMapMutex;
+
 	/**
 	 * 
 	 * getSlaveServerUri <div lang="ja">
@@ -136,7 +142,7 @@ public class ROSNode {
 
 	/**
 	 * 
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * 
 	 * @param hostAddress
 	 * @param port
@@ -165,7 +171,11 @@ public class ROSNode {
 		publishingTopicSet = new HashSet<ROSTopic>();
 		subscribingTopicSet = new HashSet<ROSTopic>();
 		topicValueMapMutex = new Object();
-		topicValueMap = new HashMap<ROSTopic, ROSTopicValue>();
+		subscribedTopicValueMap = new HashMap<ROSTopic, ROSTopicValue>();
+		publishedTopicValueMap = new HashMap<ROSTopic, ROSTopicValue>();
+		topicPublishedFlagMap = new HashMap<ROSTopic, Boolean>();
+		publishedTopicValueMapMutex = new Object();
+		
 		// this.hostAddress = hostAddress;
 		this.nodeName = nodeName;
 
@@ -346,7 +356,7 @@ public class ROSNode {
 		@Override
 		public Object[] getSubscriptions(String callerId) {
 			logger.entering(this.getClass().getName(), "getSubscriptions");
-			// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 			return null;
 		}
 
@@ -365,7 +375,7 @@ public class ROSNode {
 		@Override
 		public Object[] getPublications(String callerId) {
 			logger.entering(this.getClass().getName(), "getPublications");
-			// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 			return null;
 		}
 
@@ -385,7 +395,7 @@ public class ROSNode {
 		public Object[] paramUpdate(String callerId, String parameterKey,
 				Object[] parameterValue) {
 			logger.entering(this.getClass().getName(), "paramUpdate");
-			// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 			return null;
 		}
 
@@ -521,7 +531,7 @@ public class ROSNode {
 			try {
 				ROSCore.getInstance().unregisterSubscriber(topic, this);
 			} catch (XmlRpcRequestException e) {
-				// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+				// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 				e.printStackTrace();
 			}
 		}
@@ -529,7 +539,7 @@ public class ROSNode {
 			try {
 				ROSCore.getInstance().unregisterPublisher(topic, this);
 			} catch (XmlRpcRequestException e) {
-				// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+				// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 				e.printStackTrace();
 			}
 		}
@@ -603,13 +613,37 @@ public class ROSNode {
 	 */
 	public void setTopicValue(ROSTopic topic, ROSTopicValue topicValue) {
 		synchronized (topicValueMapMutex) {
-			topicValueMap.put(topic, topicValue);
+			subscribedTopicValueMap.put(topic, topicValue);
 		}
 	}
 
 	public ROSTopicValue subscribe(ROSTopic topic) {
 		synchronized (topicValueMapMutex) {
-			return topicValueMap.get(topic);
+			return subscribedTopicValueMap.get(topic);
+		}
+	}
+
+	public void publish(ROSTopicValue value) {
+		synchronized (publishedTopicValueMapMutex) {
+			ROSTopic topic = value.getTopic();
+			publishedTopicValueMap.put(topic, value);
+			topicPublishedFlagMap.put(topic, true);
+		}
+	}
+	
+	public boolean topicPublished(ROSTopic topic) {
+		synchronized (publishedTopicValueMapMutex) {
+			Boolean flag = topicPublishedFlagMap.get(topic);
+			if(flag != null && flag) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	public ROSTopicValue getPublishedTopicValue(ROSTopic topic) {
+		synchronized (publishedTopicValueMapMutex) {
+			return publishedTopicValueMap.get(topic);
 		}
 	}
 }

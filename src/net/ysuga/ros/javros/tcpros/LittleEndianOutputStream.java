@@ -27,7 +27,7 @@ public class LittleEndianOutputStream extends OutputStream {
 	OutputStream outputStream;
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
@@ -70,5 +70,28 @@ public class LittleEndianOutputStream extends OutputStream {
 	@Override
 	public void write(int b) throws IOException {
 		outputStream.write(b);
+	}
+
+	public void writeShort(Short o) throws IOException {
+		short value = o.shortValue();
+		byte[] bv = {(byte)value, (byte)(value >> 8)};
+		outputStream.write(bv);
+	}
+
+	public void writeByte(Byte o) throws IOException {
+		write(o);
+	}
+
+	public void writeUInt(Long o) throws IOException {
+		int bit = (int)(o.longValue() & 0xFFFFFFFF);
+		writeInt(bit);
+	}
+
+	public void writeFloat(Float o) throws IOException {
+		writeInt(Float.floatToRawIntBits(o));
+	}
+
+	public void writeDouble(Double o) throws IOException {
+		writeLong(Double.doubleToRawLongBits(o));
 	}
 }

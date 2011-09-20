@@ -23,21 +23,23 @@ import net.ysuga.javros.node.topic.ROSTopicValue;
  * @author ysuga
  *
  */
-public class TurtleSimTest {
+public class TurtleSimTest2 {
 
 	
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
 	 * </div>
 	 */
-	public TurtleSimTest() {
-		String myAddress = "192.168.42.128";
-		String hostAddress = "192.168.42.129";
+	public TurtleSimTest2() {
+		String myAddress = "192.168.42.133";
+		String hostAddress = "192.168.42.133";
 
+		//String myAddress = "localhost";
+		//String hostAddress = "localhost";
 		//String myAddress = "192.168.1.100";
 		//String hostAddress = "192.168.1.101";
 
@@ -48,11 +50,17 @@ public class TurtleSimTest {
 
 			ROSTopic topic = ROSTopicFactory.createROSTopic("/turtle1/pose", "turtlesim/Pose");
 			ROSCore.getInstance().registerSubscriber(topic, node);
+			
+			ROSTopic topic2 = ROSTopicFactory.createROSTopic("/turtle1/command_velocity", "turtlesim/Velocity");
+			ROSCore.getInstance().registerPublisher(topic2, node);
 
 			for(int i = 0;i < 100;i++) {
 				Thread.sleep(500);
 				ROSTopicValue topicValue = node.subscribe(topic);
 				System.out.println("Subscribed=\n" + topicValue);
+				
+				ROSTopicValue command = new ROSTopicValue(topic2, 1f, 1f);
+				node.publish(command);
 			}
 			
 			ROSCore.getInstance().unregisterSubscriber(topic, node);
@@ -60,7 +68,7 @@ public class TurtleSimTest {
 			node.unregisterAll();
 			System.exit(0);
 		} catch (Exception e) {
-			// TODO Ž©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 			e.printStackTrace();
 		}
 	}
@@ -78,7 +86,7 @@ public class TurtleSimTest {
 	 */
 	public static void main(String[] args) {
 		try {
-			new TurtleSimTest();
+			new TurtleSimTest2();
 		} catch (Exception ex) {
 			System.out.println("Exception: "  + ex);
 		}
