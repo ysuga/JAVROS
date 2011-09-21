@@ -1,28 +1,25 @@
 /**
- * RemoteCommandService.java
+ * RosRefService.java
  *
  * @author Yuki Suga (ysuga.net)
  * @date 2011/09/06
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.remote;
+package net.ysuga.javros.core.rosref;
 
 import net.ysuga.javros.node.service.ROSService;
 import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 
 /**
- * <div lang="ja">
- *
- * </div>
- * <div lang="en">
- *
- * </div>
+ * rosref service object.
+ * 
+ * Users do not have to use this class.
+ * 
  * @author ysuga
  *
  */
-
-public class RemoteCommandService extends ROSService {
+public class RosRefService extends ROSService {
 	final public static String SERVICE_SIGNATURE =  "/refrection";
 	final public static String SERVICE_TYPE = "refrection_service/Refrection";
 	final public static String SERVICE_MD5SUM = "fbd945844e2fc7a26e9684715f3a7f45";
@@ -41,16 +38,16 @@ public class RemoteCommandService extends ROSService {
 	 * 
 	 * Singleton
 	 */
-	static private RemoteCommandService instance;
+	static private RosRefService instance;
 	
-	static public RemoteCommandService getInstance() {
+	static public RosRefService getInstance() {
 		if(instance == null) {
-			instance = new RemoteCommandService();
+			instance = new RosRefService();
 		}
 		return instance;
 	}
 	
-	private RemoteCommandService() {
+	private RosRefService() {
 		super(SERVICE_SIGNATURE, SERVICE_TYPE, SERVICE_MD5SUM);
 		ROSServiceTypeInfo info = new ROSServiceTypeInfo();
 		for(String[] pair: params) {

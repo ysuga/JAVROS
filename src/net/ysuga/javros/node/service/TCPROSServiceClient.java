@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.node.XmlRpcRequestException;
-import net.ysuga.javros.remote.RemoteCommandServiceException;
 import net.ysuga.javros.util.ROSUri;
 import net.ysuga.ros.javros.tcpros.LittleEndianInputStream;
 import net.ysuga.ros.javros.tcpros.LittleEndianOutputStream;
@@ -44,11 +44,11 @@ public class TCPROSServiceClient {
 	private TCPROSTransport transport;
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^ </div> <div lang="en"> Constructor </div>
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ </div> <div lang="en"> Constructor </div>
 	 * 
 	 * @throws IOException
 	 * @throws UnknownHostException
-	 * @throws RemoteCommandServiceException
+	 * @throws RosRefException
 	 * @throws XmlRpcRequestException
 	 * @throws ROSServiceNotFoundException
 	 * @throws TransportException
@@ -69,12 +69,12 @@ public class TCPROSServiceClient {
 	}
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^ </div> <div lang="en"> Constructor </div>
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ </div> <div lang="en"> Constructor </div>
 	 * 
 	 * @throws IOException
 	 * @throws TransportException
 	 * @throws UnknownHostException
-	 * @throws RemoteCommandServiceException
+	 * @throws RosRefException
 	 * @throws XmlRpcRequestException
 	 * @throws ROSServiceNotFoundException
 	 */
@@ -119,7 +119,7 @@ public class TCPROSServiceClient {
 	 * @return </div>
 	 * @throws TransportException 
 	 * @throws ROSServiceNotFoundException
-	 * @throws RemoteCommandServiceException
+	 * @throws RosRefException
 	 * @throws XmlRpcRequestException
 	 * @throws IOException
 	 * @throws UnknownHostException

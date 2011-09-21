@@ -11,24 +11,25 @@ package net.ysuga.javros.node;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
- * <div lang="ja">
- *
- * </div>
- * <div lang="en">
- *
- * </div>
+ * XML-RPC caller wrapper class.
+ * 
+ * In this step, this uses Apache XML-RPC.
+ * 
  * @author ysuga
  *
  */
 public class XmlRpcWrapper {
 
 
+	static Logger logger = Logger.getLogger(XmlRpcWrapper.class.getName())
+	;
 	protected String hostUri;
 	
 	public void setHostUri(String hostUri) throws MalformedURLException {
@@ -44,6 +45,10 @@ public class XmlRpcWrapper {
 	protected final XmlRpcClientConfigImpl config;
 
 	
+	/**
+	 * Constructor
+	 * @param uri
+	 */
 	public XmlRpcWrapper(URL uri) {
 		this.hostUri = uri.toString();
 		config = new XmlRpcClientConfigImpl();
@@ -57,12 +62,22 @@ public class XmlRpcWrapper {
 		client = new XmlRpcClient();
 	}
 	
+	/**
+	 * Requesting Function of Xml-Rpc service.
+	 * @param method
+	 * @param param
+	 * @return
+	 * @throws XmlRpcRequestException
+	 */
+	@SuppressWarnings("unchecked")
 	protected Object request(String method, List param)
 			throws XmlRpcRequestException {
+		logger.entering(this.getClass().getName(), "request("+method+ ", \n" + param + ")");
 		try {
 			return client.execute(config, method, param);
 		} catch (XmlRpcException ex) {
-			ex.printStackTrace();
+			logger.severe("XmlRpcWrapper.request failed.");
+			
 			throw new XmlRpcRequestException();
 		}
 	}

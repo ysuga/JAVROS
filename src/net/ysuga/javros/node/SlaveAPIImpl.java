@@ -1,42 +1,48 @@
 /**
- * SlaveAPIImpl.java
- *
- * @author Yuki Suga (ysuga.net)
- * @date 2011/09/05
- * @copyright 2011, ysuga.net allrights reserved.
- *
+ * 
  */
 package net.ysuga.javros.node;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicFactory;
+import net.ysuga.javros.node.topic.ROSTopicPublisherRef;
+import net.ysuga.javros.node.topic.ROSTopicSubscriberRef;
+import net.ysuga.javros.util.ROSUri;
 
-/**
- * <div lang="ja">
- * 
- * </div> <div lang="en">
- * 
- * </div>
- * 
- * @author ysuga
- * 
- */
 public class SlaveAPIImpl implements SlaveAPI {
 
 	static Logger logger = Logger.getLogger(SlaveAPIImpl.class.getName());
+	
+	/**
+	 * 
+	 */
+	private final ROSNode owner;
 
 	/**
-	 * <div lang="ja">
-	 * 
+	 * Constructor
+	 * @param rosNode
+	 */
+	public SlaveAPIImpl(ROSNode rosNode) {
+		owner = rosNode;
+	}
+
+	/**
+	 * get bus status api
 	 * @param callerId
-	 * @return </div> <div lang="en">
-	 * @param callerId
-	 * @return </div>
+	 * @return 
 	 */
 	@Override
 	public Object[] getBusStats(String callerId) {
-		logger.entering(this.getClass().getName(), "getBusStatus");
+		logger.entering(SlaveAPIImpl.class.getName(), "getBusStats", callerId);
 		int topicNum = 0;
 		Object[] publishStats = new Object[topicNum];
 		Object[] subscribeStats = new Object[topicNum];
@@ -55,223 +61,201 @@ public class SlaveAPIImpl implements SlaveAPI {
 	}
 
 	/**
-	 * <div lang="ja">
 	 * 
 	 * @param callerId
 	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
 	 */
 	@Override
 	public Object[] getBusInfo(String callerId) {
 		logger.entering(this.getClass().getName(), "getBusInfo");
-		int connectionNum = 0;
-		Object[] retval = new Object[connectionNum];
-		return retval;
+		ArrayList<Object> objectArray = new ArrayList<Object>();
+		int counter = 0;
+		synchronized (owner.publisherMapMutex) {
+			for (ROSTopicPublisherRef publisher : owner.publisherMap.values()) {
+				Object[] busInfo = publisher.getBusInfo(counter);
+				objectArray.add(busInfo);
+				counter++;
+			}
+		}
+		synchronized (owner.subscriberMapMutex) {
+			for (ROSTopicSubscriberRef subscriber : owner.subscriberMap.values()) {
+				Object[] busInfo = subscriber.getBusInfo(counter);
+				objectArray.add(busInfo);
+				counter++;
+			}
+		}
+		Object[] ret = new Object[] { new Integer(1), "bus info",
+				objectArray.toArray() };
+		return ret;
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
 	 */
 	@Override
-	public Object[] getMasterUri(String callerId) throws XmlRpcRequestException {
-		logger.entering(this.getClass().getName(), "getMasterUri");
+	public Object[] getMasterUri(String callerId)
+			throws XmlRpcRequestException {
 		String masterUri = ROSCore.getInstance().getHostAddress();
 		return new Object[] { masterUri };
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
+	 * @return 
 	 */
 	@Override
-	public Object[] shutdown(String callerId) throws XmlRpcRequestException {
-		logger.entering(this.getClass().getName(), "shutdown");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
-		return null;
+	public Object[] shutdown(String callerId) {
+		ROSNode.logger.entering(this.getClass().getName(), "shutdown(" + callerId
+				+ ")");
+		owner.shutdownServer();
+		return new Object[] { new Integer(1), "OK", new Integer(0) };
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @param msg
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @param msg
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
+	 * @return 
 	 */
 	@Override
-	public Object[] shutdown(String callerId, String msg)
-			throws XmlRpcRequestException {
-		logger.entering(this.getClass().getName(), "shutdown");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
-		return null;
+	public Object[] shutdown(String callerId, String msg) {
+		ROSNode.logger.entering(this.getClass().getName(), "shutdown(" + callerId
+				+ ", " + msg + ")");
+		owner.shutdownServer();
+		return new Object[] { new Integer(1), "OK", new Integer(0) };
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
 	 */
 	@Override
-	public Object[] getPid(String callerId) throws XmlRpcRequestException {
+	public Object[] getPid(String callerId) {
 		logger.entering(this.getClass().getName(), "getPid");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
-		return null;
+		int pid = 10001;
+		return new Object[] { new Integer(1), "pid", new Integer(pid) };
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
 	 */
 	@Override
-	public Object[] getSubscriptions(String callerId)
-			throws XmlRpcRequestException {
+	public Object[] getSubscriptions(String callerId) {
 		logger.entering(this.getClass().getName(), "getSubscriptions");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
+		// TODO ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÍÇΩÔøΩÔøΩÔøΩ\ÔøΩbÔøΩhÔøΩEÔøΩXÔøΩ^ÔøΩu
 		return null;
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div> <div lang="en">
-	 * @param callerId
-	 * @return
-	 * @throws XmlRpcRequestException
-	 *             </div>
 	 */
 	@Override
-	public Object[] getPublications(String callerId)
-			throws XmlRpcRequestException {
+	public Object[] getPublications(String callerId) {
 		logger.entering(this.getClass().getName(), "getPublications");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
+		// TODO ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÍÇΩÔøΩÔøΩÔøΩ\ÔøΩbÔøΩhÔøΩEÔøΩXÔøΩ^ÔøΩu
 		return null;
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @param parameterKey
 	 * @param parameterValue
-	 * @return </div> <div lang="en">
-	 * @param callerId
-	 * @param parameterKey
-	 * @param parameterValue
-	 * @return </div>
+	 * @return
 	 */
 	@Override
 	public Object[] paramUpdate(String callerId, String parameterKey,
 			Object[] parameterValue) {
 		logger.entering(this.getClass().getName(), "paramUpdate");
-		// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩÉÅÉ\ÉbÉhÅEÉXÉ^Éu
+		// TODO ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÍÇΩÔøΩÔøΩÔøΩ\ÔøΩbÔøΩhÔøΩEÔøΩXÔøΩ^ÔøΩu
 		return null;
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
 	 * @param callerId
 	 * @param topic
 	 * @param publishers
-	 * @return </div> <div lang="en">
-	 * @param callerId
-	 * @param topic
-	 * @param publishers
-	 * @return </div>
+	 * @return 
 	 */
 	@Override
 	public Object[] publisherUpdate(String callerId, String topic,
 			Object[] publishers) {
 		logger.entering(this.getClass().getName(), "publisherUpdate");
-		for (Object o : publishers) {
-			System.out.println("Topic(" + topic + ") has publisher:"
-					+ o.toString());
+
+		try {
+			ROSTopic rosTopic = null;
+			rosTopic = ROSTopicFactory.createROSTopic(topic);
+
+			List<Object> currentPublisher = Arrays.asList(publishers);
+
+			synchronized (owner.publisherMapMutex) {
+				for (Object o : currentPublisher) {
+					if (!owner.publisherMap.containsKey(o)) {
+						ROSTopicPublisherRef publisherRef = new ROSTopicPublisherRef(
+								new URL((String) o), rosTopic, owner);
+						owner.publisherMap.put(new ROSUri((String) o),
+								publisherRef);
+					}
+				}
+
+				for (ROSUri publisherUri : owner.publisherMap.keySet()) {
+					if (!currentPublisher.contains(publisherUri.getUri())) {
+						ROSTopicPublisherRef publisherRef = owner.publisherMap
+								.remove(publisherUri);
+						publisherRef.cleanup();
+						publisherRef = null;
+					}
+				}
+			}
+			return new Object[] { new Integer(1), "publisher update",
+					new Integer(0) };
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			logger.severe("ROSNode.publisherUpdate failed:\n"
+					+ sw.getBuffer().toString());
 		}
 
-		return new Object[] { 1, "OK", 0 };
+		return new Object[] { new Integer(0), "failed.", new Integer(0) };
 	}
 
 	/**
-	 * <div lang="ja">
-	 * 
+	 * Called by Topic subscriber.
 	 * @param callerId
 	 * @param topic
 	 * @param protocols
-	 * @return </div> <div lang="en">
-	 * @param callerId
-	 * @param topic
-	 * @param protocols
-	 * @return </div>
+	 * @return 
 	 */
 	@Override
 	public Object[] requestTopic(String callerId, String topic,
 			Object[] protocols) {
-		logger.entering(this.getClass().getName(), "requestTopic");
-		System.out.println("requestTopic called.(" + callerId + ", " + topic
-				+ ", [" + protocols.length + "])");
-		for (Object protocol : protocols) {
-			Object[] props = (Object[]) protocol;
-			String protocolName = (String) props[0];
-			logger.finer("argument:" + callerId + ", " + topic + ", "
-					+ (String) protocolName);
-			for (Object o : props) {
-				System.out.println("o=" + o.toString());
-			}
+		ROSNode.logger.entering(this.getClass().getName(), "requestTopic("
+				+ callerId + ", " + topic + ")");
+		try {
+			ROSUri uri = ROSCore.getInstance()
+					.getNodeUri((String) callerId);
+			ROSTopic rosTopic = ROSTopicFactory.createROSTopic(topic);
+			ROSTopicSubscriberRef subscriberRef = new ROSTopicSubscriberRef(
+					callerId, new URL(uri.getUri()), rosTopic, owner);
+			owner.subscriberMap.put(rosTopic, subscriberRef);
+			Thread.yield();
+			Object[] ret = new Object[] {
+					new Integer(1),
+					"request topic",
+					new Object[] { "TCPROS", owner.getSlaveServerAddress(),
+							new Integer(subscriberRef.getPort()) } };
+			return ret;
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			logger.severe("ROSNode.requestTopic failed:\n"
+					+ sw.getBuffer().toString());
 		}
-		/*
-		 * Hashtable table = new Hashtable(); table.put("code", new Integer(0));
-		 * table.put("statusMessage", new String("OK"));
-		 * table.put("protocolParams", new Object[]{"TCPROS"});
-		 * 
-		 * return table;
-		 */
-		return new Object[] { new Integer(0), "OK", new Object[] { "TCPROS" } };
+
+		return new Object[] { new Integer(0), "failed.", new Integer(0) };
 	}
 
 }

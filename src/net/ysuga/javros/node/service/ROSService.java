@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.node.XmlRpcRequestException;
-import net.ysuga.javros.remote.RemoteCommandServiceException;
 
 /**
  * <div lang="ja">
@@ -41,7 +41,7 @@ public class ROSService {
 	}
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * @param name
 	 * @param type
 	 * @param md5sum
@@ -69,7 +69,7 @@ public class ROSService {
 	
 	/**
 	 * @return type
-	 * @throws RemoteCommandServiceException 
+	 * @throws RosRefException 
 	 * @throws XmlRpcRequestException 
 	 * @throws IOException 
 	 * @throws UnknownHostException 
@@ -81,7 +81,7 @@ public class ROSService {
 	
 	/**
 	 * @return md5sum
-	 * @throws RemoteCommandServiceException 
+	 * @throws RosRefException 
 	 * @throws XmlRpcRequestException 
 	 * @throws IOException 
 	 * @throws UnknownHostException 

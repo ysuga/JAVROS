@@ -13,8 +13,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.node.XmlRpcRequestException;
-import net.ysuga.javros.remote.RemoteCommandServiceException;
 
 /**
  * <div lang="ja">
@@ -35,7 +35,7 @@ public class ROSServiceFactory {
 	
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
@@ -44,7 +44,7 @@ public class ROSServiceFactory {
 	private ROSServiceFactory() {
 	}
 
-	static public ROSService createROSService(String serviceName) throws RemoteCommandServiceException  {
+	static public ROSService createROSService(String serviceName) throws RosRefException  {
 		if(!createdROSServiceMap.containsKey(serviceName)) {
 			String serviceType = ROSCore.getInstance().getServiceType(serviceName);
 			ROSService service = new ROSService(serviceName, serviceType, ROSCore.getInstance().getServiceMd5Sum(serviceType));

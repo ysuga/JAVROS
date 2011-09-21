@@ -68,7 +68,6 @@ public class TurtleSimTest2 {
 			node.unregisterAll();
 			System.exit(0);
 		} catch (Exception e) {
-			// TODO �����������ꂽ catch �u���b�N
 			e.printStackTrace();
 		}
 	}

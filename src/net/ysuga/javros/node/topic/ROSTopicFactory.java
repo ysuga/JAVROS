@@ -13,9 +13,9 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
-import net.ysuga.javros.remote.RemoteCommandServiceException;
 
 /**
  * <div lang="ja">
@@ -36,7 +36,7 @@ public class ROSTopicFactory {
 	
 	/**
 	 * <div lang="ja">
-	 * ÉRÉìÉXÉgÉâÉNÉ^
+	 * ÔøΩRÔøΩÔøΩÔøΩXÔøΩgÔøΩÔøΩÔøΩNÔøΩ^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
@@ -45,31 +45,31 @@ public class ROSTopicFactory {
 	private ROSTopicFactory() {
 	}
 
-	static public ROSTopic createROSTopic(String topicName) throws RemoteCommandServiceException  {
+	static public ROSTopic createROSTopic(String topicName) throws RosRefException  {
 		if(!createdROSTopicMap.containsKey(topicName)) {
 			String topicType = ROSCore.getInstance().getTopicType(topicName);
 			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
 			try {
 				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
 			} catch (ROSTopicInvalidTypeInfoException e) {
-				// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩ catch ÉuÉçÉbÉN
+				// TODO ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÍÇΩ catch ÔøΩuÔøΩÔøΩÔøΩbÔøΩN
 				e.printStackTrace();
-				throw new RemoteCommandServiceException("invalid topic type:" + topicName);
+				throw new RosRefException("invalid topic type:" + topicName);
 			}
 			createdROSTopicMap.put(topicName, topic);
 		}
 		return createdROSTopicMap.get(topicName);
 	}
 	
-	static public ROSTopic createROSTopic(String topicName, String topicType) throws RemoteCommandServiceException {
+	static public ROSTopic createROSTopic(String topicName, String topicType) throws RosRefException {
 		if(!createdROSTopicMap.containsKey(topicName)) {
 			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
 			try {
 				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
 			} catch (ROSTopicInvalidTypeInfoException e) {
-				// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩ catch ÉuÉçÉbÉN
+				// TODO ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÍÇΩ catch ÔøΩuÔøΩÔøΩÔøΩbÔøΩN
 				e.printStackTrace();
-				throw new RemoteCommandServiceException("invalid topic type:" + topicName);
+				throw new RosRefException("invalid topic type:" + topicName);
 			}
 			createdROSTopicMap.put(topicName, topic);
 		}

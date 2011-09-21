@@ -20,4 +20,12 @@ package net.ysuga.javros.node;
  */
 public class XmlRpcRequestException extends Exception {
 
+	public XmlRpcRequestException() {
+		super();
+	}
+	
+	public XmlRpcRequestException(String string) {
+		super(string);
+	}
+
 }
