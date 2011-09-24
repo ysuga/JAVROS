@@ -12,9 +12,10 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.ROSCoreRef;
 import net.ysuga.javros.core.rosref.RosRefException;
-import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.value.ROSValueInvalidTypeInfoException;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">
@@ -44,11 +45,11 @@ public class ROSServiceFactory {
 	private ROSServiceFactory() {
 	}
 
-	static public ROSService createROSService(String serviceName) throws RosRefException  {
+	static public ROSService createROSService(String serviceName) throws RosRefException, ROSValueInvalidTypeInfoException  {
 		if(!createdROSServiceMap.containsKey(serviceName)) {
-			String serviceType = ROSCore.getInstance().getServiceType(serviceName);
-			ROSService service = new ROSService(serviceName, serviceType, ROSCore.getInstance().getServiceMd5Sum(serviceType));
-			service.setServiceTypeInfo(ROSCore.getInstance().getServiceTypeInfo(service.getType()));
+			String serviceType = ROSCoreRef.getInstance().getServiceType(serviceName);
+			ROSService service = new ROSService(serviceName, serviceType, ROSCoreRef.getInstance().getServiceMd5Sum(serviceType));
+			service.setServiceTypeInfo(ROSCoreRef.getInstance().getServiceTypeInfo(service.getType()));
 			createdROSServiceMap.put(serviceName, service);
 		}
 		return createdROSServiceMap.get(serviceName);

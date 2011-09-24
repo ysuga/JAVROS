@@ -6,9 +6,9 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.core;
+package net.ysuga.javros.core.master;
 
-import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * Interface of Master API of ROS service.

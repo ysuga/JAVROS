@@ -8,6 +8,7 @@
  */
 package net.ysuga.javros.node.topic;
 
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -19,13 +20,14 @@ import java.util.logging.Logger;
 import net.ysuga.javros.node.ROSNode;
 import net.ysuga.javros.node.SlaveAPIHelper;
 import net.ysuga.javros.node.SlaveAPIRef;
-import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.transport.LittleEndianInputStream;
+import net.ysuga.javros.transport.TCPROSHeader;
+import net.ysuga.javros.transport.TCPROSTransport;
+import net.ysuga.javros.transport.TransportException;
 import net.ysuga.javros.util.ROSUri;
 import net.ysuga.javros.util.ReturnValue;
-import net.ysuga.ros.javros.tcpros.LittleEndianInputStream;
-import net.ysuga.ros.javros.tcpros.TCPROSHeader;
-import net.ysuga.ros.javros.tcpros.TCPROSTransport;
-import net.ysuga.ros.javros.tcpros.TransportException;
+import net.ysuga.javros.value.ROSValue;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">
@@ -96,8 +98,8 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 			connect();
 			while (true) {
 				byte[] value = transport.receive();
-				ROSTopicValue topicValue = new ROSTopicValue(topic, value, this);
-				this.ownerSubscriber.setTopicValue(this.topic, topicValue);
+				ROSValue topicValue = new ROSValue(topic.getTypeInfo(), value, this);
+				this.ownerSubscriber.updatePublishedTopicValue(this.topic, topicValue);
 				Thread.yield();
 			}
 		} catch (Exception e) {

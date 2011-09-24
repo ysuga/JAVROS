@@ -12,10 +12,11 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.ROSCoreRef;
 import net.ysuga.javros.core.rosref.RosRefException;
-import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
+import net.ysuga.javros.value.ROSValueInvalidTypeInfoException;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">
@@ -47,11 +48,11 @@ public class ROSTopicFactory {
 
 	static public ROSTopic createROSTopic(String topicName) throws RosRefException  {
 		if(!createdROSTopicMap.containsKey(topicName)) {
-			String topicType = ROSCore.getInstance().getTopicType(topicName);
-			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
+			String topicType = ROSCoreRef.getInstance().getTopicType(topicName);
+			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCoreRef.getInstance().getTopicMd5Sum(topicType));
 			try {
-				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
-			} catch (ROSTopicInvalidTypeInfoException e) {
+				topic.setTopicTypeInfo(ROSCoreRef.getInstance().getTopicTypeInfo(topic.getType()));
+			} catch (ROSValueInvalidTypeInfoException e) {
 				// TODO �����������ꂽ catch �u���b�N
 				e.printStackTrace();
 				throw new RosRefException("invalid topic type:" + topicName);
@@ -63,10 +64,10 @@ public class ROSTopicFactory {
 	
 	static public ROSTopic createROSTopic(String topicName, String topicType) throws RosRefException {
 		if(!createdROSTopicMap.containsKey(topicName)) {
-			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCore.getInstance().getTopicMd5Sum(topicType));
+			ROSTopic topic = new ROSTopic(topicName, topicType, ROSCoreRef.getInstance().getTopicMd5Sum(topicType));
 			try {
-				topic.setTopicTypeInfo(ROSCore.getInstance().getTopicTypeInfo(topic.getType()));
-			} catch (ROSTopicInvalidTypeInfoException e) {
+				topic.setTopicTypeInfo(ROSCoreRef.getInstance().getTopicTypeInfo(topic.getType()));
+			} catch (ROSValueInvalidTypeInfoException e) {
 				// TODO �����������ꂽ catch �u���b�N
 				e.printStackTrace();
 				throw new RosRefException("invalid topic type:" + topicName);

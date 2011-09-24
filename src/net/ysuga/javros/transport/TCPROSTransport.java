@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.transport;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -45,7 +45,7 @@ public class TCPROSTransport {
 	protected LittleEndianOutputStream outputStream;
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^ </div> <div lang="en"> Constructor </div>
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ </div> <div lang="en"> Constructor </div>
 	 */
 	public TCPROSTransport() {
 	}

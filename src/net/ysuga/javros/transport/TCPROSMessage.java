@@ -1,12 +1,12 @@
 /**
- * ROSTopicInvalidTypeInfoException.java
+ * TCPROSMessageBase.java
  *
  * @author Yuki Suga (ysuga.net)
- * @date 2011/09/16
+ * @date 2011/09/06
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node.topic;
+package net.ysuga.javros.transport;
 
 /**
  * <div lang="ja">
@@ -18,6 +18,7 @@ package net.ysuga.javros.node.topic;
  * @author ysuga
  *
  */
-public class ROSTopicInvalidTypeInfoException extends Exception {
+public interface TCPROSMessage {
 
+	public byte[] serialize() throws TransportException;
 }

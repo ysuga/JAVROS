@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node;
+package net.ysuga.javros.xmlrpc;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,14 +70,14 @@ public class XmlRpcWrapper {
 	 * @throws XmlRpcRequestException
 	 */
 	@SuppressWarnings("unchecked")
-	protected Object request(String method, List param)
+	protected Object[] request(String method, Object...param)
 			throws XmlRpcRequestException {
 		logger.entering(this.getClass().getName(), "request("+method+ ", \n" + param + ")");
 		try {
-			return client.execute(config, method, param);
+			return (Object[])client.execute(config, method, param);
 		} catch (XmlRpcException ex) {
 			logger.severe("XmlRpcWrapper.request failed.");
-			
+			ex.printStackTrace();
 			throw new XmlRpcRequestException();
 		}
 	}

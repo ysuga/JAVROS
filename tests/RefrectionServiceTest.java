@@ -1,6 +1,6 @@
 import java.util.List;
 
-import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.ROSCoreRef;
 import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 import net.ysuga.javros.node.topic.ROSTopic;
 import net.ysuga.javros.node.topic.ROSTopicFactory;
@@ -39,16 +39,14 @@ public class RefrectionServiceTest {
 	 */
 	public static void main(String[] args) {
 		try {
-			ROSCore core = ROSCore.init("192.168.42.139");
+			ROSCoreRef core = ROSCoreRef.init("192.168.42.139");
 			System.out.println ("Type = " + core.getServiceType("/refrection"));
 			ROSServiceTypeInfo info = core.getServiceTypeInfo("refrection_service/Refrection");
-			System.out.println(info.returnParam);
-			System.out.println(info.argumentParam);
 			
 			List<String> list = core.getTopicPublisherNameList(ROSTopicFactory.createROSTopic("/rosout"));
 			System.out.println("/rosout:" + list);
 		} catch (Exception e) {
-			// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 			e.printStackTrace();
 		}
 	}

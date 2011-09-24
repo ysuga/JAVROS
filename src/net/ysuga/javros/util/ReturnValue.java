@@ -40,7 +40,7 @@ public class ReturnValue<RetType> {
 	
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
@@ -49,6 +49,12 @@ public class ReturnValue<RetType> {
 	public ReturnValue(int code, String statusMessage, RetType value) {
 		this.code = code;
 		this.statusMessage = statusMessage;
+		this.value = value;
+	}
+	
+	public ReturnValue(Object code, Object statusMessage, RetType value) {
+		this.code = ((Integer)code).intValue();
+		this.statusMessage = (String)statusMessage;
 		this.value = value;
 	}
 	

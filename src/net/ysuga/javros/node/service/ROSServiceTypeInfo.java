@@ -8,8 +8,10 @@
  */
 package net.ysuga.javros.node.service;
 
-import java.util.Hashtable;
 import java.util.StringTokenizer;
+
+import net.ysuga.javros.value.ROSValueInvalidTypeInfoException;
+import net.ysuga.javros.value.ROSValueTypeInfo;
 
 /**
  * <div lang="ja">
@@ -23,45 +25,45 @@ import java.util.StringTokenizer;
  */
 public class ROSServiceTypeInfo {
 
-	/**
-	 * Note:
-	 * key -- parameter name
-	 * value -- parameter type
-	 */
-
-	public Hashtable<String, String> returnParam;
-
-	/**
-	 * Note:
-	 * key -- parameter name
-	 * value -- parameter type
-	 */
-	public Hashtable<String, String> argumentParam;
+	public ROSValueTypeInfo argumentInfo;
+	
+	public ROSValueTypeInfo returnInfo;
+	
 
 	final public static String DIVIDER = "---";
 
 	public ROSServiceTypeInfo() {
-		returnParam = new Hashtable<String, String>();
-		argumentParam = new Hashtable<String, String>();
+		this.argumentInfo = new ROSValueTypeInfo();
+		this.returnInfo = new ROSValueTypeInfo();
 	}
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^ </div> <div lang="en"> Constructor </div>
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ </div> <div lang="en"> Constructor </div>
 	 * 
 	 * @param str
+	 * @throws ROSValueInvalidTypeInfoException 
 	 */
-	public ROSServiceTypeInfo(String str) {
+	public ROSServiceTypeInfo(String str) throws ROSValueInvalidTypeInfoException {
 		this();
 		StringTokenizer tokenizer = new StringTokenizer(str);
-		Hashtable<String, String> targetTable = argumentParam;
+		StringBuilder argumentInfoStr = new StringBuilder();
+		StringBuilder returnInfoStr = new StringBuilder();
+		
+		StringBuilder typeInfo = argumentInfoStr;
 		while (tokenizer.hasMoreTokens()) {
-			String buffer = tokenizer.nextToken();
-			if (buffer.equals(DIVIDER)) {
-				targetTable = returnParam;
-				continue;
+			String type = tokenizer.nextToken();
+			if (type.equals(DIVIDER)) {
+				typeInfo = returnInfoStr;
+				break;
 			}
-			targetTable.put(tokenizer.nextToken(), buffer);
+			typeInfo.append(type);
+			typeInfo.append(" ");
+			typeInfo.append(tokenizer.nextToken());
+			typeInfo.append("\n");
 		}
+		
+		argumentInfo = new ROSValueTypeInfo(argumentInfoStr.toString());
+		returnInfo = new ROSValueTypeInfo(returnInfoStr.toString());
 	}
 
 }

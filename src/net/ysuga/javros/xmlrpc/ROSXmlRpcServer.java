@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node;
+package net.ysuga.javros.xmlrpc;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,7 +60,7 @@ public class ROSXmlRpcServer {
 	/**
 	 * 
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * @param handler
 	 * @param hostAddress
 	 * @param port
@@ -113,9 +113,10 @@ public class ROSXmlRpcServer {
 		try {
 			webServer.start();
 		} catch (IOException e) {
-			PrintWriter pw = new PrintWriter(new StringWriter());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			logger.severe("ROSXmlRpcServer.start() failed(" + pw.toString() + ")");
+			logger.severe("ROSXmlRpcServer.start() failed(" + sw.toString() + ")");
 			throw new ROSXmlRpcServerException();
 		}
 	}

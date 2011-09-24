@@ -11,9 +11,9 @@ package net.ysuga.javros.node.service;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.ROSCoreRef;
 import net.ysuga.javros.core.rosref.RosRefException;
-import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">

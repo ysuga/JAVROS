@@ -6,16 +6,16 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.core;
+package net.ysuga.javros.core.master;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.util.ROSUri;
 import net.ysuga.javros.util.ReturnValue;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * MasterAPI helper.

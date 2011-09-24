@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.transport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,10 +27,10 @@ public class TCPROSHeader extends HashMap<String, String> implements
 		TCPROSMessage {
 
 	/**
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^ </div> <div lang="en"> Constructor </div>
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ </div> <div lang="en"> Constructor </div>
 	 */
 	public TCPROSHeader() {
-		// TODO ©“®¶¬‚³‚ê‚½ƒRƒ“ƒXƒgƒ‰ƒNƒ^[EƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½Eï¿½Xï¿½^ï¿½u
 	}
 
 	public TCPROSHeader(byte[] byteArray) throws TransportException {

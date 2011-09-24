@@ -6,34 +6,35 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros;
+package net.ysuga.javros.core;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.ysuga.javros.core.MasterAPIHelper;
-import net.ysuga.javros.core.MasterAPIRef;
+import net.ysuga.javros.core.master.MasterAPIHelper;
+import net.ysuga.javros.core.master.MasterAPIRef;
+import net.ysuga.javros.core.parameter.ParameterServerAPIHelper;
+import net.ysuga.javros.core.parameter.ParameterServerAPIRef;
 import net.ysuga.javros.core.rosref.RosRefClient;
 import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.core.rosref.RosRefService;
 import net.ysuga.javros.node.ROSNode;
-import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.node.service.ROSService;
 import net.ysuga.javros.node.service.ROSServiceFactory;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
+import net.ysuga.javros.node.service.ROSServiceProvider;
 import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 import net.ysuga.javros.node.topic.ROSTopic;
-import net.ysuga.javros.node.topic.ROSTopicInvalidTypeInfoException;
-import net.ysuga.javros.node.topic.ROSTopicTypeInfo;
+import net.ysuga.javros.transport.TransportException;
 import net.ysuga.javros.util.ROSUri;
 import net.ysuga.javros.util.ReturnValue;
-import net.ysuga.ros.javros.tcpros.TransportException;
+import net.ysuga.javros.value.ROSValue;
+import net.ysuga.javros.value.ROSValueInvalidTypeInfoException;
+import net.ysuga.javros.value.ROSValueTypeInfo;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * Reference of the roscore (Master) object. Users can use master functions
@@ -44,12 +45,12 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  * @author ysuga
  * 
  */
-public class ROSCore {
+public class ROSCoreRef {
 
 	/**
 	 * logger
 	 */
-	static private Logger logger = Logger.getLogger(ROSCore.class.getName());
+	static private Logger logger = Logger.getLogger(ROSCoreRef.class.getName());
 
 	/**
 	 * default master port
@@ -59,14 +60,14 @@ public class ROSCore {
 	/**
 	 * the only instance of this class (singleton)
 	 */
-	static private ROSCore theOnlyInstance;
+	static private ROSCoreRef theOnlyInstance;
 
 	/**
 	 * static method for getting the only instance of this class (singleton)
 	 * 
 	 * @return the only instance of this class
 	 */
-	final static public ROSCore getInstance() {
+	final static public ROSCoreRef getInstance() {
 		return theOnlyInstance;
 	}
 
@@ -114,6 +115,13 @@ public class ROSCore {
 	final private MasterAPIHelper getMaster() {
 		return masterAPI;
 	}
+	
+	final private ParameterServerAPIHelper parameterServerAPI;
+	
+	final private ParameterServerAPIHelper getParameterServer() {
+		return parameterServerAPI;
+	}
+
 
 	/**
 	 * Constructor
@@ -124,18 +132,21 @@ public class ROSCore {
 	 *            port number of master computer. this argument can be omitted.
 	 * @throws MalformedURLException
 	 */
-	private ROSCore(String hostAddress, int portNumber)
+	private ROSCoreRef(String hostAddress, int portNumber)
 			throws MalformedURLException {
 		this.callerid = "/javrosCore";
 		this.hostAddress = hostAddress;
 		this.port = portNumber;
 		masterAPI = new MasterAPIHelper(new MasterAPIRef(new URL("http://"
 				+ hostAddress + ":" + port)));
+		
+		parameterServerAPI = new ParameterServerAPIHelper(new ParameterServerAPIRef(new URL("http://"
+				+ hostAddress + ":" + port)));
 	}
 
 	/**
-	 * ROSCore initialization function. This function must be called the first
-	 * of all.
+	 * ROSCore initialization function. 
+	 * You do not have to call this function. This function is called by ROS.init method.
 	 * 
 	 * @param hostAddress
 	 *            host address of master PC.
@@ -143,7 +154,7 @@ public class ROSCore {
 	 *         static method anywhere.
 	 * @throws MalformedURLException
 	 */
-	static public ROSCore init(String hostAddress) throws MalformedURLException {
+	static public ROSCoreRef init(String hostAddress) throws MalformedURLException {
 		return init(hostAddress, DEFAULT_PORT);
 	}
 
@@ -160,10 +171,10 @@ public class ROSCore {
 	 *         static method anywhere.
 	 * @throws MalformedURLException
 	 */
-	static public ROSCore init(String hostAddress, int portNumber)
+	static public ROSCoreRef init(String hostAddress, int portNumber)
 			throws MalformedURLException {
-		logger.entering(ROSCore.class.getName(), "init", new Object[]{hostAddress, portNumber});
-		theOnlyInstance = new ROSCore(hostAddress, portNumber);
+		logger.entering(ROSCoreRef.class.getName(), "init", new Object[]{hostAddress, portNumber});
+		theOnlyInstance = new ROSCoreRef(hostAddress, portNumber);
 		return getInstance();
 	}
 
@@ -183,7 +194,7 @@ public class ROSCore {
 	 */
 	public List<String> getAllServiceProviderUri(ROSService service)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "getAllServiceProviderUri", service);
+		logger.entering(ROSCoreRef.class.getName(), "getAllServiceProviderUri", service);
 		ArrayList<String> retval = new ArrayList<String>();
 		ReturnValue<String> result = masterAPI.lookupService(callerid, service
 				.getName());
@@ -201,7 +212,7 @@ public class ROSCore {
 	 */
 	public List<String> getTopicPublisherNameList(ROSTopic topic)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "getTopicPublisherNameList", topic);
+		logger.entering(ROSCoreRef.class.getName(), "getTopicPublisherNameList", topic);
 		
 		ArrayList<String> retval = new ArrayList<String>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
@@ -244,11 +255,12 @@ public class ROSCore {
 	 * @return
 	 * @throws XmlRpcRequestException
 	 * @throws RosRefException
+	 * @throws ROSValueInvalidTypeInfoException 
 	 * @see ROSService
 	 */
 	public List<ROSService> getProvidedServiceList()
-			throws XmlRpcRequestException, RosRefException {
-		logger.entering(ROSCore.class.getName(), "getProvidedServiceList");
+			throws XmlRpcRequestException, RosRefException, ROSValueInvalidTypeInfoException {
+		logger.entering(ROSCoreRef.class.getName(), "getProvidedServiceList");
 		
 		ArrayList<ROSService> retval = new ArrayList<ROSService>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
@@ -269,7 +281,7 @@ public class ROSCore {
 	 */
 	public List<String> getPublishedTopicNameList()
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "getPublishedTopicNameList");
+		logger.entering(ROSCoreRef.class.getName(), "getPublishedTopicNameList");
 		
 		ArrayList<String> retval = new ArrayList<String>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
@@ -329,9 +341,10 @@ public class ROSCore {
 	 * @param serviceType
 	 * @return
 	 * @throws RosRefException
+	 * @throws ROSValueInvalidTypeInfoException 
 	 */
 	final public ROSServiceTypeInfo getServiceTypeInfo(String serviceType)
-			throws RosRefException {
+			throws RosRefException, ROSValueInvalidTypeInfoException {
 		return new ROSServiceTypeInfo(rosrefCommand("srv", "show", serviceType));
 	}
 
@@ -341,11 +354,11 @@ public class ROSCore {
 	 * @param topicType
 	 * @return
 	 * @throws RosRefException
-	 * @throws ROSTopicInvalidTypeInfoException
+	 * @throws ROSValueInvalidTypeInfoException
 	 */
-	final public ROSTopicTypeInfo getTopicTypeInfo(String topicType)
-			throws RosRefException, ROSTopicInvalidTypeInfoException {
-		return new ROSTopicTypeInfo(rosrefCommand("msg", "show", topicType));
+	final public ROSValueTypeInfo getTopicTypeInfo(String topicType)
+			throws RosRefException, ROSValueInvalidTypeInfoException {
+		return new ROSValueTypeInfo(rosrefCommand("msg", "show", topicType));
 	}
 
 	/**
@@ -359,7 +372,7 @@ public class ROSCore {
 	 */
 	final private String rosrefCommand(String command, String option, String arg)
 			throws RosRefException {
-		logger.entering(ROSCore.class.getName(), "rosrefCommand" + new Object[]{command, option, arg});
+		logger.entering(ROSCoreRef.class.getName(), "rosrefCommand" + new Object[]{command, option, arg});
 		
 		try {
 			List<String> services = getProvidedServiceNameList();
@@ -377,11 +390,9 @@ public class ROSCore {
 			}
 
 			RosRefClient client = new RosRefClient(callerid);
-			List<Object> args = Arrays.asList((Object) command,
-					(Object) option, (Object) arg);
-			List<Object> ret = client.execute(args);
-			String retval = ((String) ret.get(0)).trim();
-			logger.exiting(ROSCore.class.getName(), "rosrefCommand", retval);
+			ROSValue ret = client.call(command, option, arg);
+			String retval = ((String) ret.get("ret")).trim();
+			logger.exiting(ROSCoreRef.class.getName(), "rosrefCommand", retval);
 			return retval;
 		} catch (XmlRpcRequestException e) {
 			logger.severe("master api request failed.");
@@ -394,6 +405,9 @@ public class ROSCore {
 			throw new RosRefException("Remote command service is not found..");
 		}
 	}
+	
+	
+	
 
 	/**
 	 * get node's uri from node name
@@ -415,27 +429,17 @@ public class ROSCore {
 	 * @param node
 	 * @throws XmlRpcRequestException
 	 */
-	public void registerSubscriber(ROSTopic topic, ROSNode node)
+	public List<ROSUri> registerSubscriber(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "registerSubscriber", new Object[]{topic,node});
+		logger.entering(ROSCoreRef.class.getName(), "registerSubscriber", new Object[]{topic,node});
 		ReturnValue<List<ROSUri>> ret = getMaster().registerSubscriber(
 				node.getName(), topic.getName(), topic.getType(),
 				node.getSlaveServerUri());
-		node.addSubscribingTopic(topic);
-		for (ROSUri uri : ret.getValue()) {
-			try {
-				node.addPublisherRef(uri, topic);
-			} catch (Exception e) {
-				logger.severe("ROSCore.registerSubscriber(" + topic + ", "
-						+ node + ") failed when adding PublisherRef.");
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				logger.severe("ROSTopicSubscriberRef.run failed:\n"
-						+ sw.getBuffer().toString());
-				throw new XmlRpcRequestException();
-			}
+		if(!ret.isSuccess()) {
+			logger.severe("registerSubscriber failed:" + ret.getStatusMessage());
+			throw new XmlRpcRequestException("register subscriber failed.");
 		}
+		return ret.getValue();
 	}
 
 	/**
@@ -445,14 +449,16 @@ public class ROSCore {
 	 * @return
 	 * @throws XmlRpcRequestException
 	 */
-	public ReturnValue<Integer> unregisterSubscriber(ROSTopic topic,
+	public void unregisterSubscriber(ROSTopic topic,
 			ROSNode node) throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "unregisterSubscriber", new Object[]{topic, node});
+		logger.entering(ROSCoreRef.class.getName(), "unregisterSubscriber", new Object[]{topic, node});
 		
 		ReturnValue<Integer> ret = getMaster().unregisterSubscriber(
 				node.getName(), topic.getName(), node.getSlaveServerUri());
-		node.removeSubscribingTopic(topic);
-		return ret;
+		if(!ret.isSuccess()) {
+			logger.severe("ROSCoreRef.unregisterSubscriber("+topic + ", " + node + ") failed.");
+			throw new XmlRpcRequestException("unregister subscriber failed.");
+		}
 	}
 
 	/**
@@ -463,7 +469,7 @@ public class ROSCore {
 	 */
 	public void registerPublisher(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "registerPublisher" + new Object[]{topic,node});
+		logger.entering(ROSCoreRef.class.getName(), "registerPublisher" + new Object[]{topic,node});
 		
 		ReturnValue<List<ROSUri>> ret = getMaster().registerPublisher(
 				node.getName(), topic.getName(), topic.getType(),
@@ -472,23 +478,86 @@ public class ROSCore {
 			logger.severe("registerPublisher failed:" + ret.getStatusMessage());
 			throw new XmlRpcRequestException("register publisher failed.");
 		}
-		node.addPublishingTopic(topic);
 	}
 
 	/**
 	 * unregister publisher 
+	 * 
 	 * @param topic
 	 * @param node
 	 * @return
 	 * @throws XmlRpcRequestException
 	 */
-	public ReturnValue<Integer> unregisterPublisher(ROSTopic topic, ROSNode node)
+	public void unregisterPublisher(ROSTopic topic, ROSNode node)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCore.class.getName(), "unregisterPublisher", new Object[]{topic,node});
+		logger.entering(ROSCoreRef.class.getName(), "unregisterPublisher", new Object[]{topic,node});
 		ReturnValue<Integer> ret = getMaster().unregisterPublisher(
 				node.getName(), topic.getName(), node.getSlaveServerUri());
-		node.removeSubscribingTopic(topic);
-		return ret;
+		if(!ret.isSuccess()) {
+			logger.severe("ROSCoreRef.unregisterPublisher("+topic + ", " + node + ") failed.");
+			throw new XmlRpcRequestException("unregister publisher failed.");
+		}
+	}
+
+	/**
+	 * register subscribe Parameter. This method will register the node to Parameter Server. 
+	 * If the node registered, Parameter Server automatically notify the update of the parameter 
+	 * value specified by the key.
+	 * 
+	 * @param node
+	 * @param key
+	 * @throws XmlRpcRequestException
+	 */
+	public void registerParameter(ROSNode node, String key) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "registerParameter", new Object[]{node, key});
+		
+		getParameterServer().subscribeParam(node.getName(), node.getSlaveServerUri(), key);
+	}
+	
+	/**
+	 * unregister Parameter. This will unregiter the node from Parameter Server. See registerParameter method.
+	 * @param node
+	 * @param key
+	 * @throws XmlRpcRequestException
+	 */
+	public void unregisterParameter(ROSNode node, String key) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "unregisterParameter", new Object[]{node, key});
+
+		getParameterServer().unsubscribeParam(node.getName(), node.getSlaveServerUri(), key);
+	}
+	
+	/**
+	 * set parameter value & key. if parameter is not registered, it's added to parameter server. 
+	 * @param key
+	 * @param value
+	 * @throws XmlRpcRequestException
+	 */
+	public void setParameter(String key, Object value) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "setParameter", new Object[]{key, value});
+		
+		getParameterServer().setParam("/javrosCore", key, value.toString());
+	}
+	
+	/**
+	 * remove parameter from parameter server.
+	 * @param key
+	 * @throws XmlRpcRequestException
+	 */
+	public void removeParameter(String key) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "removeParameter", new Object[]{key});
+		
+		getParameterServer().deleteParam("/javrosCore", key);
+	}
+	
+	/**
+	 * 
+	 * @param provider
+	 * @param node
+	 * @throws XmlRpcRequestException 
+	 */
+	public void registerServiceProvider(ROSServiceProvider provider, ROSNode node) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "registerServiceProvider", new Object[]{provider, node});
+		getMaster().registerService(node.getName(), provider.getService().getName(), provider.getUri(), node.getSlaveServerUri());
 	}
 
 }

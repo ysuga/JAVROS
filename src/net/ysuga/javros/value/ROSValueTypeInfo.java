@@ -6,11 +6,12 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node.topic;
+package net.ysuga.javros.value;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 
 /**
  * <div lang="ja">
@@ -22,25 +23,29 @@ import java.util.StringTokenizer;
  * @author ysuga
  * 
  */
-public class ROSTopicTypeInfo {
-	List<String> typeList;
-	List<String> nameList;
+public class ROSValueTypeInfo {
+	public List<String> typeList;
+	public List<String> nameList;
 
-	public ROSTopicTypeInfo() {
+	public ROSValueTypeInfo() {
 		typeList = new ArrayList<String>();
 		nameList = new ArrayList<String>();
 	}
 
+	public void put(String type, String name) {
+		typeList.add(type);
+		nameList.add(name);
+	}
 	/**
 	 * 
-	 * <div lang="ja"> ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * <div lang="ja"> ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * 
 	 * @param str
 	 *            </div> <div lang="en"> Constructor
 	 * @param str
 	 *            </div>
 	 */
-	public ROSTopicTypeInfo(String str) throws ROSTopicInvalidTypeInfoException {
+	public ROSValueTypeInfo(String str) throws ROSValueInvalidTypeInfoException {
 		this();
 		StringTokenizer tokenizer = new StringTokenizer(str);
 		while (tokenizer.hasMoreTokens()) {
@@ -50,7 +55,7 @@ public class ROSTopicTypeInfo {
 				typeList.add(type);
 				nameList.add(name);
 			} else {
-				throw new ROSTopicInvalidTypeInfoException();
+				throw new ROSValueInvalidTypeInfoException();
 			}
 		}
 	}

@@ -1,8 +1,13 @@
-import net.ysuga.javros.ROSCore;
+import javax.swing.JOptionPane;
+
+import net.ysuga.javros.ROS;
+import net.ysuga.javros.core.ROSCoreRef;
+import net.ysuga.javros.core.rosref.RosRefException;
 import net.ysuga.javros.node.ROSNode;
+import net.ysuga.javros.node.ROSNodeException;
 import net.ysuga.javros.node.topic.ROSTopic;
 import net.ysuga.javros.node.topic.ROSTopicFactory;
-import net.ysuga.javros.node.topic.ROSTopicValue;
+import net.ysuga.javros.value.ROSValue;
 
 /**
  * ROSNodeTest.java
@@ -26,41 +31,58 @@ import net.ysuga.javros.node.topic.ROSTopicValue;
 public class ROSNodeTest {
 
 	
+	class TestNode extends ROSNode {
+		ROSTopic topic;
+		public TestNode() throws ROSNodeException {
+			super("/javrosNode");
+		}
+
+		@Override
+		public int onExecute() throws Exception {
+			Thread.sleep(500);
+			ROSValue value = subscribe(topic);
+			System.out.println("value=\n"+value);
+			return 0;
+		}
+
+		@Override
+		public int onFinalized() {
+			return 0;
+		}
+
+		@Override
+		public int onInitialized() throws Exception {
+			topic = ROSTopicFactory.createROSTopic("/Num", "std_msgs/Int32");
+			registerSubscriber(topic);
+			return 0;
+		}
+	}
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor
 	 * </div>
 	 */
 	public ROSNodeTest() {
-		String myAddress = "192.168.42.128";
-		String hostAddress = "192.168.42.129";
+		String myAddress = "localhost";
+		String hostAddress = "localhost";
 
 		//String myAddress = "192.168.1.100";
 		//String hostAddress = "192.168.1.101";
 
 		try {
-			ROSCore.init(hostAddress);
+			ROS.init(myAddress, hostAddress);
 
-			ROSNode node = new ROSNode(myAddress, 40000, "/javrosNode");
-
-			ROSTopic topic = ROSTopicFactory.createROSTopic("/Num", "std_msgs/Int32");
-			ROSCore.getInstance().registerSubscriber(topic, node);
-
-			for(int i = 0;i < 100;i++) {
-				Thread.sleep(500);
-				ROSTopicValue value = node.subscribe(topic);
-				System.out.println("value=\n"+value);
-			}
+			TestNode node = new TestNode();
+			ROS.launchNode(node);
 			
-			ROSCore.getInstance().unregisterSubscriber(topic, node);
+			JOptionPane.showMessageDialog(null, "Press OK to exit");
 			
-			node.unregisterAll();
 			System.exit(0);
 		} catch (Exception e) {
-			// TODO Ž©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+			// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 			e.printStackTrace();
 		}
 	}

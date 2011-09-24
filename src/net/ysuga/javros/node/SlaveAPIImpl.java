@@ -11,17 +11,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.ysuga.javros.ROSCore;
+import net.ysuga.javros.core.ROSCoreRef;
+import net.ysuga.javros.node.parameter.ROSParameter;
 import net.ysuga.javros.node.topic.ROSTopic;
 import net.ysuga.javros.node.topic.ROSTopicFactory;
 import net.ysuga.javros.node.topic.ROSTopicPublisherRef;
 import net.ysuga.javros.node.topic.ROSTopicSubscriberRef;
 import net.ysuga.javros.util.ROSUri;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
+/**
+ * Slave API implementation.
+ * This is used in ROSNode class.
+ * @author ysuga
+ *
+ */
 public class SlaveAPIImpl implements SlaveAPI {
 
 	static Logger logger = Logger.getLogger(SlaveAPIImpl.class.getName());
-	
+
 	/**
 	 * 
 	 */
@@ -29,6 +37,7 @@ public class SlaveAPIImpl implements SlaveAPI {
 
 	/**
 	 * Constructor
+	 * 
 	 * @param rosNode
 	 */
 	public SlaveAPIImpl(ROSNode rosNode) {
@@ -37,8 +46,9 @@ public class SlaveAPIImpl implements SlaveAPI {
 
 	/**
 	 * get bus status api
+	 * 
 	 * @param callerId
-	 * @return 
+	 * @return
 	 */
 	@Override
 	public Object[] getBusStats(String callerId) {
@@ -67,7 +77,7 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 */
 	@Override
 	public Object[] getBusInfo(String callerId) {
-		logger.entering(this.getClass().getName(), "getBusInfo");
+		logger.entering(SlaveAPIImpl.class.getName(), "getBusInfo", callerId);
 		ArrayList<Object> objectArray = new ArrayList<Object>();
 		int counter = 0;
 		synchronized (owner.publisherMapMutex) {
@@ -78,7 +88,8 @@ public class SlaveAPIImpl implements SlaveAPI {
 			}
 		}
 		synchronized (owner.subscriberMapMutex) {
-			for (ROSTopicSubscriberRef subscriber : owner.subscriberMap.values()) {
+			for (ROSTopicSubscriberRef subscriber : owner.subscriberMap
+					.values()) {
 				Object[] busInfo = subscriber.getBusInfo(counter);
 				objectArray.add(busInfo);
 				counter++;
@@ -86,6 +97,7 @@ public class SlaveAPIImpl implements SlaveAPI {
 		}
 		Object[] ret = new Object[] { new Integer(1), "bus info",
 				objectArray.toArray() };
+		logger.exiting(SlaveAPIImpl.class.getName(), "getBusInfo", ret);
 		return ret;
 	}
 
@@ -94,20 +106,19 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 * @return
 	 */
 	@Override
-	public Object[] getMasterUri(String callerId)
-			throws XmlRpcRequestException {
-		String masterUri = ROSCore.getInstance().getHostAddress();
+	public Object[] getMasterUri(String callerId) throws XmlRpcRequestException {
+		logger.entering(SlaveAPIImpl.class.getName(), "getMasterUri", callerId);
+		String masterUri = ROSCoreRef.getInstance().getHostAddress();
 		return new Object[] { masterUri };
 	}
 
 	/**
 	 * @param callerId
-	 * @return 
+	 * @return
 	 */
 	@Override
 	public Object[] shutdown(String callerId) {
-		ROSNode.logger.entering(this.getClass().getName(), "shutdown(" + callerId
-				+ ")");
+		logger.entering(SlaveAPIImpl.class.getName(), "shutdown", callerId);
 		owner.shutdownServer();
 		return new Object[] { new Integer(1), "OK", new Integer(0) };
 	}
@@ -115,12 +126,12 @@ public class SlaveAPIImpl implements SlaveAPI {
 	/**
 	 * @param callerId
 	 * @param msg
-	 * @return 
+	 * @return
 	 */
 	@Override
 	public Object[] shutdown(String callerId, String msg) {
-		ROSNode.logger.entering(this.getClass().getName(), "shutdown(" + callerId
-				+ ", " + msg + ")");
+		ROSNode.logger.entering(SlaveAPIImpl.class.getName(), "shutdown",
+				new Object[] { callerId, msg });
 		owner.shutdownServer();
 		return new Object[] { new Integer(1), "OK", new Integer(0) };
 	}
@@ -131,7 +142,7 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 */
 	@Override
 	public Object[] getPid(String callerId) {
-		logger.entering(this.getClass().getName(), "getPid");
+		logger.entering(SlaveAPIImpl.class.getName(), "getPid");
 		int pid = 10001;
 		return new Object[] { new Integer(1), "pid", new Integer(pid) };
 	}
@@ -142,8 +153,8 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 */
 	@Override
 	public Object[] getSubscriptions(String callerId) {
-		logger.entering(this.getClass().getName(), "getSubscriptions");
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		logger.entering(SlaveAPIImpl.class.getName(), "getSubscriptions");
+		// TODO Not implemented yet
 		return null;
 	}
 
@@ -153,8 +164,8 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 */
 	@Override
 	public Object[] getPublications(String callerId) {
-		logger.entering(this.getClass().getName(), "getPublications");
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		logger.entering(SlaveAPIImpl.class.getName(), "getPublications");
+		// TODO Not implemented yet
 		return null;
 	}
 
@@ -166,22 +177,27 @@ public class SlaveAPIImpl implements SlaveAPI {
 	 */
 	@Override
 	public Object[] paramUpdate(String callerId, String parameterKey,
-			Object[] parameterValue) {
-		logger.entering(this.getClass().getName(), "paramUpdate");
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+			Object parameterValue) {
+		logger.entering(SlaveAPIImpl.class.getName(), "paramUpdate", new Object[]{callerId, parameterKey, parameterValue});
+		// TODO Not Implemented
+		ROSParameter param = this.owner.getParameter(parameterKey);
+		if(param != null) {
+			param.setValue(parameterValue);
+		}
 		return null;
 	}
 
+	
 	/**
 	 * @param callerId
 	 * @param topic
 	 * @param publishers
-	 * @return 
+	 * @return
 	 */
 	@Override
 	public Object[] publisherUpdate(String callerId, String topic,
 			Object[] publishers) {
-		logger.entering(this.getClass().getName(), "publisherUpdate");
+		logger.entering(SlaveAPIImpl.class.getName(), "publisherUpdate", new Object[]{callerId, topic, publishers});
 
 		try {
 			ROSTopic rosTopic = null;
@@ -223,19 +239,18 @@ public class SlaveAPIImpl implements SlaveAPI {
 
 	/**
 	 * Called by Topic subscriber.
+	 * 
 	 * @param callerId
 	 * @param topic
 	 * @param protocols
-	 * @return 
+	 * @return
 	 */
 	@Override
 	public Object[] requestTopic(String callerId, String topic,
 			Object[] protocols) {
-		ROSNode.logger.entering(this.getClass().getName(), "requestTopic("
-				+ callerId + ", " + topic + ")");
+		ROSNode.logger.entering(this.getClass().getName(), "requestTopic", new Object[]{callerId, topic, protocols});
 		try {
-			ROSUri uri = ROSCore.getInstance()
-					.getNodeUri((String) callerId);
+			ROSUri uri = ROSCoreRef.getInstance().getNodeUri((String) callerId);
 			ROSTopic rosTopic = ROSTopicFactory.createROSTopic(topic);
 			ROSTopicSubscriberRef subscriberRef = new ROSTopicSubscriberRef(
 					callerId, new URL(uri.getUri()), rosTopic, owner);

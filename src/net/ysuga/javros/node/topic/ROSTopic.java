@@ -12,8 +12,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import net.ysuga.javros.core.rosref.RosRefException;
-import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
+import net.ysuga.javros.value.ROSValueTypeInfo;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">
@@ -31,13 +32,13 @@ public class ROSTopic {
 	final private String type;
 	final private String md5sum;
 	
-	private ROSTopicTypeInfo topicTypeInfo;
+	private ROSValueTypeInfo topicTypeInfo;
 	
-	public ROSTopicTypeInfo getTopicTypeInfo() {
+	public ROSValueTypeInfo getTypeInfo() {
 		return topicTypeInfo;
 	}
 	
-	public void setTopicTypeInfo(ROSTopicTypeInfo info) {
+	public void setTopicTypeInfo(ROSValueTypeInfo info) {
 		this.topicTypeInfo = info;
 	}
 	/**

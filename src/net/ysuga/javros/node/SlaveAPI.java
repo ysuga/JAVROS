@@ -8,16 +8,10 @@
  */
 package net.ysuga.javros.node;
 
-import java.util.Hashtable;
-import java.util.List;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
- * <div lang="ja">
- *
- * </div>
- * <div lang="en">
- *
- * </div>
+ * ROS Slave API interfaces
  * @author ysuga
  *
  */
@@ -40,11 +34,12 @@ public interface SlaveAPI {
 	
 	public Object[] getPublications(String callerId) throws XmlRpcRequestException;
 	
-	public Object[] paramUpdate(String callerId, String parameterKey, Object[] parameterValue) throws XmlRpcRequestException ;
 	
 	public Object[] publisherUpdate(String callerId, String topic, Object[] publishers) throws XmlRpcRequestException;
 	
 	public Object[] requestTopic(String callerId, String topic, Object[] protocols) throws XmlRpcRequestException;
+
+	public Object[] paramUpdate(String callerId, String parameterKey, Object parameterValue) throws XmlRpcRequestException;
 	
 	
 

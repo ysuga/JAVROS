@@ -8,7 +8,7 @@
  */
 package net.ysuga.javros.node.service;
 
-import net.ysuga.ros.javros.tcpros.TCPROSHeader;
+import net.ysuga.javros.transport.TCPROSHeader;
 
 /**
  * <div lang="ja">
@@ -24,7 +24,7 @@ public class TCPROSServiceClientHeader extends TCPROSHeader {
 
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * </div>
 	 * <div lang="en">
 	 * Constructor

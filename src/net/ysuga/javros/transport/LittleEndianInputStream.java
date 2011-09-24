@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.transport;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class LittleEndianInputStream extends InputStream {
 	private InputStream inputStream;
 	/**
 	 * <div lang="ja">
-	 * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	 * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
 	 * @param buf
 	 * </div>
 	 * <div lang="en">
@@ -38,7 +38,7 @@ public class LittleEndianInputStream extends InputStream {
 	public LittleEndianInputStream(InputStream inputStream) {
 		super();
 		this.inputStream = inputStream;
-		// TODO ©“®¶¬‚³‚ê‚½ƒRƒ“ƒXƒgƒ‰ƒNƒ^[EƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½Eï¿½Xï¿½^ï¿½u
 	}
 	
 	public LittleEndianInputStream(byte[] byteArray) {

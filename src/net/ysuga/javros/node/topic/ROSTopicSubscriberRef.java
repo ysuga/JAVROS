@@ -8,6 +8,7 @@
  */
 package net.ysuga.javros.node.topic;
 
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -19,11 +20,12 @@ import java.util.logging.Logger;
 import net.ysuga.javros.node.ROSNode;
 import net.ysuga.javros.node.SlaveAPIHelper;
 import net.ysuga.javros.node.SlaveAPIRef;
-import net.ysuga.javros.node.XmlRpcRequestException;
+import net.ysuga.javros.transport.TCPROSHeader;
+import net.ysuga.javros.transport.TCPROSTransport;
+import net.ysuga.javros.transport.TransportException;
 import net.ysuga.javros.util.ROSUri;
-import net.ysuga.ros.javros.tcpros.TCPROSHeader;
-import net.ysuga.ros.javros.tcpros.TCPROSTransport;
-import net.ysuga.ros.javros.tcpros.TransportException;
+import net.ysuga.javros.value.ROSValue;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * <div lang="ja">
@@ -95,8 +97,8 @@ public class ROSTopicSubscriberRef extends SlaveAPIHelper implements Runnable {
 		try {
 			accept();
 			while (true) {
-				if (ownerNode.topicPublished(topic)) {
-					ROSTopicValue value = ownerNode
+				if (ownerNode.isTopicPublished(topic)) {
+					ROSValue value = ownerNode
 							.getPublishedTopicValue(topic);
 					if (value != null) {
 						byte[] b = value.serialize();

@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.ros.javros.tcpros;
+package net.ysuga.javros.transport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

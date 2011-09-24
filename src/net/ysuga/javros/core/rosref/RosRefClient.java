@@ -8,10 +8,10 @@
  */
 package net.ysuga.javros.core.rosref;
 
-import net.ysuga.javros.node.XmlRpcRequestException;
 import net.ysuga.javros.node.service.ROSServiceNotFoundException;
-import net.ysuga.javros.node.service.TCPROSServiceClient;
-import net.ysuga.ros.javros.tcpros.TransportException;
+import net.ysuga.javros.node.service.ROSServiceConsumer;
+import net.ysuga.javros.transport.TransportException;
+import net.ysuga.javros.xmlrpc.XmlRpcRequestException;
 
 /**
  * rosref service client class.
@@ -19,7 +19,7 @@ import net.ysuga.ros.javros.tcpros.TransportException;
  * @author ysuga
  *
  */
-public class RosRefClient extends TCPROSServiceClient {
+public class RosRefClient extends ROSServiceConsumer {
 
 	/**
 	 * Constructor

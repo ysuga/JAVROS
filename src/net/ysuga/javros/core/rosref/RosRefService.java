@@ -20,7 +20,7 @@ import net.ysuga.javros.node.service.ROSServiceTypeInfo;
  *
  */
 public class RosRefService extends ROSService {
-	final public static String SERVICE_SIGNATURE =  "/refrection";
+	final public static String SERVICE_SIGNATURE =  "/rosref";
 	final public static String SERVICE_TYPE = "refrection_service/Refrection";
 	final public static String SERVICE_MD5SUM = "fbd945844e2fc7a26e9684715f3a7f45";
 
@@ -51,10 +51,10 @@ public class RosRefService extends ROSService {
 		super(SERVICE_SIGNATURE, SERVICE_TYPE, SERVICE_MD5SUM);
 		ROSServiceTypeInfo info = new ROSServiceTypeInfo();
 		for(String[] pair: params) {
-			info.argumentParam.put(pair[0], pair[1]);
+			info.argumentInfo.put(pair[0], pair[1]);
 		}
 		for(String[] pair: retval) {
-			info.returnParam.put(pair[0], pair[1]);
+			info.returnInfo.put(pair[0], pair[1]);
 		}
 		this.setServiceTypeInfo(info);
 	}

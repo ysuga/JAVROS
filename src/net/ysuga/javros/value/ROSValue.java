@@ -1,3 +1,4 @@
+package net.ysuga.javros.value;
 /**
  * ROSTopicValue.java
  *
@@ -6,15 +7,17 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node.topic;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.ysuga.ros.javros.tcpros.LittleEndianInputStream;
-import net.ysuga.ros.javros.tcpros.LittleEndianOutputStream;
+import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicPublisherRef;
+import net.ysuga.javros.transport.LittleEndianInputStream;
+import net.ysuga.javros.transport.LittleEndianOutputStream;
 
 /**
  * <div lang="ja">
@@ -26,51 +29,47 @@ import net.ysuga.ros.javros.tcpros.LittleEndianOutputStream;
  * @author ysuga
  * 
  */
-public class ROSTopicValue {
+public class ROSValue {
 
 	private Map<String, Object> valueMap;
 
-	// private ROSTopicTypeInfo typeInfo;
+	private ROSValueTypeInfo typeInfo;
 
-	private ROSTopic topic;
-
-	private ROSTopicPublisherRef publisher;
-
-	public void setTopic(ROSTopic topic) {
-		this.topic = topic;
-	}
-
-	public ROSTopic getTopic() {
-		return topic;
+	public Object get(String name) {
+		return valueMap.get(name);
 	}
 
 	/**
-	 * <div lang="ja"> �R���X�g���N�^ </div> <div lang="en"> Constructor </div>
 	 * 
+	 * @param typeInfo
+	 * @param value
 	 * @param rosTopicPublisherRef
 	 * @throws IOException
 	 */
-	public ROSTopicValue(ROSTopic topic, byte[] value,
-			ROSTopicPublisherRef rosTopicPublisherRef) throws IOException {
+	public ROSValue(ROSValueTypeInfo typeInfo, byte[] value,	ROSTopicPublisherRef rosTopicPublisherRef) throws IOException {
 		valueMap = new HashMap<String, Object>();
-		this.setTopic(topic);
-		this.publisher = rosTopicPublisherRef;
-
-		decode(topic.getTopicTypeInfo(), value);
+	//	this.setTopic(topic);
+	//	this.publisher = rosTopicPublisherRef;
+		this.typeInfo = typeInfo;
+		decode(typeInfo, value);
 	}
 
-	public ROSTopicValue(ROSTopic topic, Object... objs)
-			throws ROSTopicValueInvalidArgumentException {
+	public ROSValue(ROSValueTypeInfo typeInfo, byte[] value) throws IOException {
 		valueMap = new HashMap<String, Object>();
-		this.setTopic(topic);
-		this.publisher = null;
-
-		if (!validateArgument(topic.getTopicTypeInfo(), objs)) {
-			throw new ROSTopicValueInvalidArgumentException();
+		this.typeInfo = typeInfo;
+		decode(typeInfo, value);
+	}
+	
+	public ROSValue(ROSValueTypeInfo typeInfo, Object... objs)
+			throws ROSValueInvalidArgumentException {
+		valueMap = new HashMap<String, Object>();
+		this.typeInfo = typeInfo;
+		if (!validateArgument(typeInfo, objs)) {
+			throw new ROSValueInvalidArgumentException();
 		}
 	}
 
-	private boolean validateArgument(ROSTopicTypeInfo typeInfo, Object[] objs) {
+	private boolean validateArgument(ROSValueTypeInfo typeInfo, Object[] objs) {
 		try {
 			for (int i = 0; i < typeInfo.typeList.size(); i++) {
 				String type = (String) typeInfo.typeList.get(i);
@@ -124,7 +123,7 @@ public class ROSTopicValue {
 	 *            </div>
 	 * @throws IOException
 	 */
-	private void decode(ROSTopicTypeInfo typeInfo, byte[] value)
+	private void decode(ROSValueTypeInfo typeInfo, byte[] value)
 			throws IOException {
 		LittleEndianInputStream inputStream = new LittleEndianInputStream(value);
 		for (int i = 0; i < typeInfo.typeList.size(); i++) {
@@ -176,7 +175,6 @@ public class ROSTopicValue {
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String valueName : this.valueMap.keySet()) {
-			ROSTopicTypeInfo typeInfo = getTopic().getTopicTypeInfo();
 			String typeName = (String) typeInfo.typeList.get(typeInfo.nameList
 					.indexOf(valueName));
 			Object value = valueMap.get(valueName);
@@ -195,7 +193,6 @@ public class ROSTopicValue {
 		LittleEndianOutputStream outputStream = new LittleEndianOutputStream(
 				byteStream);
 
-		ROSTopicTypeInfo typeInfo = getTopic().getTopicTypeInfo();
 		for (int i = 0; i < typeInfo.typeList.size(); i++) {
 			String type = (String) typeInfo.typeList.get(i);
 			String name = (String) typeInfo.nameList.get(i);

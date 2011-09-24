@@ -6,7 +6,7 @@
  * @copyright 2011, ysuga.net allrights reserved.
  *
  */
-package net.ysuga.javros.node;
+package net.ysuga.javros.xmlrpc;
 
 /**
  * <div lang="ja">
