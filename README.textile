@@ -67,9 +67,12 @@ h2. Next Step & Future Work
 h3. Next Step
 
 h4. ROSValue class modification.
+
 ROSValue should allow multi-class value.
 Sequence should be supported.
 
 h3. Future Work
+
 h4. ROSCore implementation.
+
 ROSCore should be implemented by JAVROS. Parameter Server is also implemented in the future.

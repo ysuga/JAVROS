@@ -34,7 +34,6 @@ public interface SlaveAPI {
 	
 	public Object[] getPublications(String callerId) throws XmlRpcRequestException;
 	
-	
 	public Object[] publisherUpdate(String callerId, String topic, Object[] publishers) throws XmlRpcRequestException;
 	
 	public Object[] requestTopic(String callerId, String topic, Object[] protocols) throws XmlRpcRequestException;

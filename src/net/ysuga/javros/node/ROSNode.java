@@ -274,9 +274,9 @@ public abstract class ROSNode {
 		try {
 			ROSCoreRef.getInstance().setParameter(parameter.getKey(),
 					parameter.getValue());
-			ROSCoreRef.getInstance()
+			String updatedKey = ROSCoreRef.getInstance()
 					.registerParameter(this, parameter.getKey());
-			subscribingParameterMap.put(parameter.getKey(),parameter);
+			subscribingParameterMap.put(updatedKey, parameter);
 		} catch (XmlRpcRequestException e) {
 			logger.severe("ROSNode.registerParameter failed.");
 			e.printStackTrace();

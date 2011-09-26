@@ -184,7 +184,7 @@ public class SlaveAPIImpl implements SlaveAPI {
 		if(param != null) {
 			param.setValue(parameterValue);
 		}
-		return null;
+		return new Object[]{new Integer(1), "param update", new Integer(0)};
 	}
 
 	

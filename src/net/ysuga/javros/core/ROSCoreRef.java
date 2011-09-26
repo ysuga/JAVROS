@@ -508,10 +508,14 @@ public class ROSCoreRef {
 	 * @param key
 	 * @throws XmlRpcRequestException
 	 */
-	public void registerParameter(ROSNode node, String key) throws XmlRpcRequestException {
+	public String registerParameter(ROSNode node, String key) throws XmlRpcRequestException {
 		logger.entering(ROSCoreRef.class.getName(), "registerParameter", new Object[]{node, key});
 		
 		getParameterServer().subscribeParam(node.getName(), node.getSlaveServerUri(), key);
+		if(!key.endsWith("/")) {
+			key = key + "/";
+		}
+		return key;
 	}
 	
 	/**

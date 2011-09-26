@@ -106,7 +106,7 @@ public class TurtleSimTest2 extends ROSNode {
 		//Creating Parameters.
 		
 		// Currently Parameter allows String only.
-		velocityParameter = ROSParameterFactory.createROSParameter("/javros/velocity", "1.0f");
+		velocityParameter = ROSParameterFactory.createROSParameter("/javros/velocity/", "1.0f");
 		registerParameter(velocityParameter);
 
 		return 0;
