@@ -54,7 +54,7 @@ public class ROSServiceConsumer {
 	public ROSServiceConsumer(String callerid, ROSService service)
 			throws XmlRpcRequestException, ROSServiceNotFoundException,
 			TransportException {
-		List<String> uris = ROSCoreRef.getInstance().getAllServiceProviderUri(
+		List<String> uris = ROSCoreRef.getInstance().getServiceProviderUri(
 				service);
 		if (uris.size() == 0) {
 			throw new ROSServiceNotFoundException();

@@ -28,6 +28,7 @@ import net.ysuga.javros.node.service.ROSServiceNotFoundException;
 import net.ysuga.javros.node.service.ROSServiceProvider;
 import net.ysuga.javros.node.service.ROSServiceTypeInfo;
 import net.ysuga.javros.node.topic.ROSTopic;
+import net.ysuga.javros.node.topic.ROSTopicFactory;
 import net.ysuga.javros.transport.TransportException;
 import net.ysuga.javros.util.ROSUri;
 import net.ysuga.javros.util.ReturnValue;
@@ -192,7 +193,7 @@ public class ROSCoreRef {
 	 *         of service (the argument).
 	 * @throws XmlRpcRequestException
 	 */
-	public List<String> getAllServiceProviderUri(ROSService service)
+	public List<String> getServiceProviderUri(ROSService service)
 			throws XmlRpcRequestException {
 		logger.entering(ROSCoreRef.class.getName(), "getAllServiceProviderUri", service);
 		ArrayList<String> retval = new ArrayList<String>();
@@ -212,18 +213,88 @@ public class ROSCoreRef {
 	 */
 	public List<String> getTopicPublisherNameList(ROSTopic topic)
 			throws XmlRpcRequestException {
-		logger.entering(ROSCoreRef.class.getName(), "getTopicPublisherNameList", topic);
+		return getTopicPublisherNameList(topic.getName());
+	}
+	
+	/**
+	 * get publishers' name list in the specific topic.
+	 * 
+	 * @param topic
+	 * @return
+	 * @throws XmlRpcRequestException
+	 */
+	public List<String> getTopicPublisherNameList(String topicName)
+			throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "getTopicPublisherNameList", topicName);
 		
 		ArrayList<String> retval = new ArrayList<String>();
 		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
 		Object[] serviceList = (Object[]) result.getValue()[0];
 		for (Object service : serviceList) {
 			Object[] serviceState = (Object[]) service;
-			if (((String) serviceState[0]).equals(topic.getName())) {
+			if (((String) serviceState[0]).equals(topicName)) {
 				Object[] publisherList = (Object[]) serviceState[1];
 				for (Object publisher : publisherList) {
 					retval.add((String) publisher);
 				}
+			}
+		}
+		return retval;
+	}
+	
+	public List<String> getTopicSubscriberNameList(ROSTopic topic) throws XmlRpcRequestException {
+		return getTopicSubscriberNameList(topic.getName());
+	}
+	/**
+	 * getTopicSubscriberNameList
+	 *
+	 * @param topic
+	 * @return
+	 * @throws XmlRpcRequestException 
+	 */
+	public List<String> getTopicSubscriberNameList(String topicName) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "getTopicSubscriberNameList", topicName);
+
+		ArrayList<String> retval = new ArrayList<String>();
+		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
+		Object[] subsList = (Object[]) result.getValue()[1];
+		for (Object subInfo : subsList) {
+			Object[] subState = (Object[]) subInfo;
+			if (((String) subState[0]).equals(topicName)) {
+				Object[] subscribersList = (Object[]) subState[1];
+				for (Object subscriberName: subscribersList) {
+					retval.add((String) subscriberName);
+				}
+			
+			}
+		}
+		return retval;
+	}
+
+	public List<String> getServiceProviderNameList(ROSService service) throws XmlRpcRequestException {
+		return getServiceProviderNameList(service.getName());
+	}
+	/**
+	 * getServiceProviderNameList
+	 *
+	 * @param service
+	 * @return
+	 * @throws XmlRpcRequestException 
+	 */
+	public List<String> getServiceProviderNameList(String serviceName) throws XmlRpcRequestException {
+		logger.entering(ROSCoreRef.class.getName(), "getServiceProviderNameList", serviceName);
+
+		ArrayList<String> retval = new ArrayList<String>();
+		ReturnValue<Object[]> result = masterAPI.getSystemState(callerid);
+		Object[] subsList = (Object[]) result.getValue()[2];
+		for (Object srvInfo : subsList) {
+			Object[] srvState = (Object[]) srvInfo;
+			if (((String) srvState[0]).equals(serviceName)) {
+				Object[] providersList = (Object[]) srvState[1];
+				for (Object providerName: providersList) {
+					retval.add((String) providerName);
+				}
+			
 			}
 		}
 		return retval;
@@ -289,6 +360,18 @@ public class ROSCoreRef {
 		for (Object service : serviceList) {
 			Object[] serviceState = (Object[]) service;
 			retval.add((String) serviceState[0]);
+		}
+		return retval;
+	}
+	
+	
+	public List<ROSTopic> getPublishedTopicList() throws XmlRpcRequestException, RosRefException {
+		logger.entering(ROSCoreRef.class.getName(), "getPublishedTopicList");
+		ArrayList<ROSTopic> retval = new ArrayList<ROSTopic>();
+		List<String> nameList = getPublishedTopicNameList();
+		for(String topicName : nameList) {
+			ROSTopic topic = ROSTopicFactory.createROSTopic(topicName);
+			retval.add(topic);
 		}
 		return retval;
 	}
@@ -382,7 +465,7 @@ public class ROSCoreRef {
 				throw new RosRefException("not found");
 			}
 
-			List<String> providers = getAllServiceProviderUri(RosRefService
+			List<String> providers = getServiceProviderUri(RosRefService
 					.getInstance());
 			if (providers.size() == 0) {
 				logger.severe("rosref service may not be launched in master pc.");
@@ -563,5 +646,10 @@ public class ROSCoreRef {
 		logger.entering(ROSCoreRef.class.getName(), "registerServiceProvider", new Object[]{provider, node});
 		getMaster().registerService(node.getName(), provider.getService().getName(), provider.getUri(), node.getSlaveServerUri());
 	}
+
+
+
+
+
 
 }

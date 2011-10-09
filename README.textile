@@ -1,17 +1,17 @@
 h1. JAVROS
 
-*Author: Yuki Suga
-*E-mail: ysuga at ysuga.net
-*Date  : since 2011/09/01
+* Author: Yuki Suga
+* E-mail: ysuga at ysuga.net
+* Date  : since 2011/09/01
 
 h2. Contents
 
-*Objective & Goal
-*Characteristics
-*Target System and Dependency
-*Usage and References
-*Link
-*Next Step & FutureWork
+* Objective & Goal
+* Characteristics
+* Target System and Dependency
+* Usage and References
+* Link
+* Next Step & FutureWork
 
 h2. Objective & Goal
 
@@ -59,7 +59,7 @@ Download and import eclipse project.
 
 h2. Link
 
-*ROS http://ros.org
+* ROS http://ros.org
 
 
 h2. Next Step & Future Work
