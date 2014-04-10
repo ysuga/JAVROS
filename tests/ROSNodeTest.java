@@ -52,7 +52,7 @@ public class ROSNodeTest {
 
 		@Override
 		public int onInitialized() throws Exception {
-			topic = ROSTopicFactory.createROSTopic("/Num", "std_msgs/Int32");
+			topic = ROSTopicFactory.createROSTopic("/tutorial", "tutorial/Input");
 			registerSubscriber(topic);
 			return 0;
 		}
@@ -66,8 +66,8 @@ public class ROSNodeTest {
 	 * </div>
 	 */
 	public ROSNodeTest() {
-		String myAddress = "localhost";
-		String hostAddress = "localhost";
+		String myAddress = "192.168.1.2";
+		String hostAddress = "192.168.1.109";
 
 		//String myAddress = "192.168.1.100";
 		//String hostAddress = "192.168.1.101";

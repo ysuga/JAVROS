@@ -150,8 +150,17 @@ public class TCPROSTransport {
 
 	public byte[] receive() throws TransportException {
 		try {
+			int c = inputStream.available();
+			while(c < 4) {
+				c = inputStream.available();
+				
+			}
 			int size = inputStream.readInt();
 			byte[] b = new byte[size];
+			 c = inputStream.available();
+			while(c < size) {
+				c = inputStream.available();
+			}
 			inputStream.read(b, 0, size);
 			return b;
 		} catch (IOException e) {

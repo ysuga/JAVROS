@@ -45,6 +45,8 @@ public class LittleEndianInputStream extends InputStream {
 		super();
 		this.inputStream = new ByteArrayInputStream(byteArray);
 	}
+	
+	
 
 	final public byte readByte() throws IOException {
 		byte[] b = new byte[1];
@@ -123,4 +125,8 @@ public class LittleEndianInputStream extends InputStream {
 		return inputStream.read();
 	}
 
+	@Override
+	public int available() throws IOException {
+		return inputStream.available();
+	}
 }

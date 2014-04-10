@@ -44,8 +44,8 @@ public class TurtleSimTest2 extends ROSNode {
 
 	
 	public static void main(String[] args) {
-		String myAddress = "127.0.0.1";
-		String hostAddress = "127.0.0.1";
+		String myAddress = "192.168.1.2";
+		String hostAddress = "192.168.1.109";
 
 		try {
 			ROS.init(myAddress, hostAddress);
@@ -76,7 +76,7 @@ public class TurtleSimTest2 extends ROSNode {
 
 		// Creating ROSValue to call publish method. ROSValue constructor can allow variable number argument call.
 		// This execute the auto-boxing function of Java. so the type cast should be strictly done by you.
-		ROSValue command = new ROSValue(velocityTopic.getTypeInfo(), (float)1.0f, (float)1.0f);
+		ROSValue command = new ROSValue(velocityTopic.getTypeInfo(), 1.0, 0., 0., 0., 0., 1.);
 		// You can publish the topic value with ROSNode.publish(ROSTopic, ROSValue) method.
 		publish(velocityTopic, command);
 
@@ -100,7 +100,7 @@ public class TurtleSimTest2 extends ROSNode {
 		poseTopic = ROSTopicFactory.createROSTopic("/turtle1/pose", "turtlesim/Pose");
 		registerSubscriber(poseTopic);
 		
-		velocityTopic = ROSTopicFactory.createROSTopic("/turtle1/command_velocity", "turtlesim/Velocity");
+		velocityTopic = ROSTopicFactory.createROSTopic("/turtle1/cmd_vel", "geometry_msgs/Twist");
 		registerPublisher(velocityTopic);
 		
 		//Creating Parameters.

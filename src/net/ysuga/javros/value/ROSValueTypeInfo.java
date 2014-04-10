@@ -9,8 +9,12 @@
 package net.ysuga.javros.value;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import net.ysuga.javros.core.ROSCoreRef;
+import net.ysuga.javros.core.rosref.RosRefException;
 
 
 /**
@@ -47,13 +51,25 @@ public class ROSValueTypeInfo {
 	 */
 	public ROSValueTypeInfo(String str) throws ROSValueInvalidTypeInfoException {
 		this();
+		ArrayList<String> premitiveTypes = new ArrayList<String>(Arrays.asList(
+				"byte", "bool", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64",
+				"float32", "float64", "string", "duration", "time"
+				));
+		
 		StringTokenizer tokenizer = new StringTokenizer(str);
 		while (tokenizer.hasMoreTokens()) {
 			String type = tokenizer.nextToken();
 			if(tokenizer.hasMoreTokens()) {
 				String name = tokenizer.nextToken();
-				typeList.add(type);
-				nameList.add(name);
+				if (!name.contains("=")) {
+					if (premitiveTypes.contains(type)) {
+						typeList.add(type);
+						nameList.add(name);
+					} else if (type.endsWith("[]") ){
+					    typeList.add(type);
+					    nameList.add(name);
+					}
+				}
 			} else {
 				throw new ROSValueInvalidTypeInfoException();
 			}

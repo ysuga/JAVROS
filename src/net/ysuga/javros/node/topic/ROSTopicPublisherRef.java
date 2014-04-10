@@ -95,11 +95,14 @@ public class ROSTopicPublisherRef extends SlaveAPIHelper implements Runnable {
 	
 	public void run() {
 		try {
+			//Thread.sleep(1000);
 			connect();
+			//Thread.sleep(3000);
 			while (true) {
 				byte[] value = transport.receive();
 				ROSValue topicValue = new ROSValue(topic.getTypeInfo(), value, this);
 				this.ownerSubscriber.updatePublishedTopicValue(this.topic, topicValue);
+				//Thread.sleep(100);
 				Thread.yield();
 			}
 		} catch (Exception e) {
