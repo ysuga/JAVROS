@@ -20,7 +20,13 @@ import net.ysuga.javros.value.ROSValue;
 
 /**
  * <div lang="ja">
- *
+ * This example is used with following ROS packages.
+ * 
+ * 1. turtlesim turtlesim_node
+ * 2. rosref refrection_node
+ * 
+ * the rosref package can be downloaded from https://github.com/ysuga/rosref.git
+ * 
  * </div>
  * <div lang="en">
  *
@@ -77,9 +83,33 @@ public class TurtleSimTest2 extends ROSNode {
 		// Creating ROSValue to call publish method. ROSValue constructor can allow variable number argument call.
 		// This execute the auto-boxing function of Java. so the type cast should be strictly done by you.
 		ROSValue command = new ROSValue(velocityTopic.getTypeInfo(), 1.0, 0., 0., 0., 0., 1.);
+		
+		// You can also set value with name of value.
+		// If msg has recursive structure, the name is connected with '.'.
+		// You know, geometry_msgs/Twist is following structure
+		// geometry_msgs/Vector3 linear
+		//   float64 x
+		//   float64 y
+		//   float64 z
+		// geometry_msgs/Vector3 angular
+		//   float64 x
+		//   float64 y
+		//   float64 z		
+		// 
+		// Then, "command" have following values:
+		// {linear.x : Double,
+		//  linear.y : Double,
+		//  linear.z : Double,
+		//  angular.x : Double,
+		//  angular.y : Double,
+		//  angular.z : Double} 
+		//
+		//  # Caution. No automatic cast applied in this framework. Always set Double value to command.
+		command.set("linear.x", 1.0);
+		
 		// You can publish the topic value with ROSNode.publish(ROSTopic, ROSValue) method.
 		publish(velocityTopic, command);
-
+		
 		// onExecute is called as rapidly as possible.
 		// Caution: If sleep is not placed here, the CPU might be used with 100%!!!
 		Thread.sleep(500);
@@ -96,11 +126,12 @@ public class TurtleSimTest2 extends ROSNode {
 	@Override
 	public int onInitialized() throws Exception {
 		// Creating Topics.
-		// Topic's Type information is collected through the rosref service. 
-		poseTopic = ROSTopicFactory.createROSTopic("/turtle1/pose", "turtlesim/Pose");
+		// Topic's Type information is collected through the rosref service.
+		// Download rosref from https://github.com/ysuga
+		poseTopic = ROSTopicFactory.createROSTopic("/turtle1/pose");
 		registerSubscriber(poseTopic);
 		
-		velocityTopic = ROSTopicFactory.createROSTopic("/turtle1/cmd_vel", "geometry_msgs/Twist");
+		velocityTopic = ROSTopicFactory.createROSTopic("/turtle1/cmd_vel");
 		registerPublisher(velocityTopic);
 		
 		//Creating Parameters.

@@ -56,18 +56,47 @@ public class ROSValueTypeInfo {
 				"float32", "float64", "string", "duration", "time"
 				));
 		
+		StringTokenizer lines = new StringTokenizer(str, "\n");
 		StringTokenizer tokenizer = new StringTokenizer(str);
+		String indent = "";
+		String context = "";
 		while (tokenizer.hasMoreTokens()) {
+			String line = lines.nextToken();
+			System.out.println(line);
 			String type = tokenizer.nextToken();
 			if(tokenizer.hasMoreTokens()) {
 				String name = tokenizer.nextToken();
+				if (indent.length() != 0 && !line.startsWith(indent)) {
+					indent = indent.substring(0, indent.length()-2);
+					if (context.indexOf(".") < 0) {
+						context = "";
+					} else {
+					String[] b = context.split(".");
+					context = context.replaceAll("." + b[b.length-1], "");
+					}
+				}
 				if (!name.contains("=")) {
 					if (premitiveTypes.contains(type)) {
 						typeList.add(type);
-						nameList.add(name);
+						if (context.length() == 0) {
+							nameList.add(name);
+						} else {
+							nameList.add(context + "." + name);
+						}
 					} else if (type.endsWith("[]") ){
 					    typeList.add(type);
-					    nameList.add(name);
+					    if (context.length() == 0) {
+							nameList.add(name);
+						} else {
+							nameList.add(context + "." + name);
+						}
+					} else {
+						indent = indent + "  ";
+						if (context.length() == 0) {
+							context = name;
+						} else {
+							context = context + "." + name;
+						}
 					}
 				}
 			} else {

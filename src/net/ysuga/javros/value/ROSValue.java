@@ -44,6 +44,15 @@ public class ROSValue {
 		}
 		return null;
 	}
+	
+	public Object set(String name, Object value) {
+		for (int i = 0;i < typeInfo.nameList.size();i++) {
+			if( typeInfo.nameList.get(i).equals(name)) {
+				return valueList.set(i, value);
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * 
@@ -291,7 +300,7 @@ public class ROSValue {
 
 		for (int i = 0; i < typeInfo.typeList.size(); i++) {
 			String type = (String) typeInfo.typeList.get(i);
-			String name = (String) typeInfo.nameList.get(i);
+			//String name = (String) typeInfo.nameList.get(i);
 			Object o = valueList.get(i);
 			serialize(outputStream, type, o);
 		}
